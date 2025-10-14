@@ -54,5 +54,13 @@ GREATER_EQUAL: '>=';
 INTEGER_LITERAL: '-'? [1-9] Digit*;
 IDENTIFIER: (Letter | '_') (Letter | Digit | '_')*;
 
+// ignored characters
+WHITESPACE: [ \t\n\r]+ -> skip;
+
+BLOCK_COMMENT: '/*' .*? '*/' -> skip;
+LINE_COMMENT: '//' .*? '\n' -> skip;
+
+ILLEGAL: .; // grammar is not sound if we match this
+
 fragment Digit: [0-9];
 fragment Letter: [A-Z];
