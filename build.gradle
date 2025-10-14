@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'antlr'
+    id 'application'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+ext {
+    antlr_version = '4.13.2'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    antlr "org.antlr:antlr4:${antlr_version}"
+    implementation "org.antlr:antlr4-runtime:${antlr_version}"
+}
+
+
+test {
+    useJUnitPlatform()
+}
+
+generateGrammarSource {
+    arguments += ["-package", "org.example.grammar"]
+    arguments += ["-visitor"]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir file("$buildDir/generated-src/antlr/main")
+        }
+    }
+}
+
+application {
+    mainClass = 'org.example.Main'
+}
