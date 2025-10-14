@@ -6,11 +6,13 @@ prog: declarationList; //function_list main;
 
 declarationList: (declaration SEMICOLON)*;
 
-declaration: varDeclaration; // | const_declaration;
-
+declaration: varDeclaration | constDeclaration;
 varDeclaration: VAR name=IDENTIFIER COLON type;
+constDeclaration: CONST name=IDENTIFIER COLON type ASSIGN expression;
 
 type: value=(INTEGER | BOOLEAN | VOID);
+
+expression: ; // TODO: fill in
 
 // reserved keywords
 MAIN: 'MAIN';
