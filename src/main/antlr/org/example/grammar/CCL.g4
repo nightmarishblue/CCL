@@ -2,7 +2,15 @@ grammar CCL;
 
 options { caseInsensitive = true; }
 
-prog: IDENTIFIER;
+prog: declarationList; //function_list main;
+
+declarationList: (declaration SEMICOLON)*;
+
+declaration: varDeclaration; // | const_declaration;
+
+varDeclaration: VAR name=IDENTIFIER COLON type;
+
+type: value=(INTEGER | BOOLEAN | VOID);
 
 // reserved keywords
 MAIN: 'MAIN';
