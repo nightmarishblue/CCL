@@ -23,3 +23,29 @@ FALSE: 'FALSE';
 
 WHILE: 'WHILE';
 SKIP_: 'SKIP';
+
+// symbols & operators
+COMMA: ',';
+SEMICOLON: ';';
+COLON: ':';
+
+ASSIGN: '=';
+
+LEFT_BRACKET: '{';
+RIGHT_BRACKET: '}';
+LEFT_PAREN: '(';
+RIGHT_PAREN: ')';
+// arithmetic
+PLUS: '+';
+MINUS: '-';
+TILDE: '~';
+// logical
+OR: '||';
+AND: '&&';
+// comparison
+EQUALS: '==';
+NOT_EQUALS: '!=';
+LESS_THAN: '<';
+GREATER_THAN: '>';
+LESS_EQUAL: '<=';
+GREATER_EQUAL: '>=';
