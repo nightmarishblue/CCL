@@ -1,3 +1,0 @@
-grammar Example;
-
-prog: EXAMPLE;
