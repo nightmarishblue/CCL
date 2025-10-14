@@ -2,7 +2,7 @@ grammar CCL;
 
 options { caseInsensitive = true; }
 
-prog: EXAMPLE;
+prog: IDENTIFIER;
 
 // reserved keywords
 MAIN: 'MAIN';
@@ -49,3 +49,10 @@ LESS_THAN: '<';
 GREATER_THAN: '>';
 LESS_EQUAL: '<=';
 GREATER_EQUAL: '>=';
+
+// identifiers & literals
+INTEGER_LITERAL: '-'? [1-9] Digit*;
+IDENTIFIER: (Letter | '_') (Letter | Digit | '_')*;
+
+fragment Digit: [0-9];
+fragment Letter: [A-Z];
