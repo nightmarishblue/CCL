@@ -2,7 +2,9 @@ grammar CCL;
 
 options { caseInsensitive = true; }
 
-prog: declarationList; //function_list main;
+prog: declarationList functionList main;
+
+main: ; // TODO
 
 declarationList: (declaration SEMICOLON)*;
 
@@ -10,9 +12,17 @@ declaration: varDeclaration | constDeclaration;
 varDeclaration: VAR name=IDENTIFIER COLON type;
 constDeclaration: CONST name=IDENTIFIER COLON type ASSIGN expression;
 
+functionList: function*;
+
+function: type name=IDENTIFIER LEFT_PAREN parameterList RIGHT_PAREN LEFT_BRACKET declarationList
+    statementBlock RETURN LEFT_PAREN expression? RIGHT_PAREN SEMICOLON RIGHT_BRACKET;
+
 type: value=(INTEGER | BOOLEAN | VOID);
 
-expression: ; // TODO: fill in
+// TODO
+expression:;
+parameterList:;
+statementBlock:;
 
 // reserved keywords
 MAIN: 'MAIN';
