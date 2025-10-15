@@ -8,17 +8,17 @@ main: MAIN LEFT_BRACKET declarationList statementBlock RIGHT_BRACKET; // (10)
 
 declarationList: (declaration SEMICOLON)*; // (2)
 declaration: varDeclaration | constDeclaration; // (3)
-varDeclaration: VAR identifier; // (4)
-constDeclaration: CONST identifier ASSIGN expression; // (5)
+varDeclaration: VAR variable; // (4)
+constDeclaration: CONST variable ASSIGN expression; // (5)
 
 functionList: function*; // (6)
 function: type name=IDENTIFIER LEFT_PAREN parameterList RIGHT_PAREN LEFT_BRACKET declarationList
     statementBlock RETURN LEFT_PAREN expression? RIGHT_PAREN SEMICOLON RIGHT_BRACKET; // (7)
 
-parameterList: (identifier (COMMA identifier)*)?;
+parameterList: (variable (COMMA variable)*)?;
 
 type: value=(INTEGER | BOOLEAN | VOID); // (8)
-identifier: name=IDENTIFIER COLON type;
+variable: name=IDENTIFIER COLON type;
 
 // TODO
 expression:;
