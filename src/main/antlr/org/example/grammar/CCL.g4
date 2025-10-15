@@ -15,8 +15,6 @@ functionList: function*; // (6)
 function: type name=IDENTIFIER LEFT_BRACKET parameterList RIGHT_BRACKET LEFT_BRACE declarationList
     statementList RETURN LEFT_BRACKET expression? RIGHT_BRACKET SEMICOLON RIGHT_BRACE; // (7)
 
-parameterList: (variable (COMMA variable)*)?; // (9)
-
 statementList: statement*; // (11)
 statementBlock: LEFT_BRACE statementList RIGHT_BRACE;
 statement: var=IDENTIFIER ASSIGN expression SEMICOLON # assignment // (12)
@@ -27,12 +25,14 @@ statement: var=IDENTIFIER ASSIGN expression SEMICOLON # assignment // (12)
     | SKIP_ SEMICOLON # skip
     ;
 
+parameterList: (variable (COMMA variable)*)?; // (9)
+argumentList: (names+=IDENTIFIER (COMMA names+=IDENTIFIER)*)?; // (18) (19)
+
 type: value=(INTEGER | BOOLEAN | VOID); // (8)
 variable: name=IDENTIFIER COLON type;
 
 // TODO
 expression:;
-argumentList:;
 condition:;
 
 // reserved keywords
