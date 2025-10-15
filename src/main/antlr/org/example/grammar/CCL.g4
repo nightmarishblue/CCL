@@ -4,7 +4,7 @@ options { caseInsensitive = true; }
 
 prog: declarationList functionList main; // (1)
 
-main: MAIN LEFT_BRACKET declarationList statementList RIGHT_BRACKET; // (10)
+main: MAIN LEFT_BRACE declarationList statementList RIGHT_BRACE; // (10)
 
 declarationList: (declaration SEMICOLON)*; // (2)
 declaration: varDeclaration | constDeclaration; // (3)
@@ -12,15 +12,15 @@ varDeclaration: VAR variable; // (4)
 constDeclaration: CONST variable ASSIGN expression; // (5)
 
 functionList: function*; // (6)
-function: type name=IDENTIFIER LEFT_PAREN parameterList RIGHT_PAREN LEFT_BRACKET declarationList
-    statementList RETURN LEFT_PAREN expression? RIGHT_PAREN SEMICOLON RIGHT_BRACKET; // (7)
+function: type name=IDENTIFIER LEFT_BRACKET parameterList RIGHT_BRACKET LEFT_BRACE declarationList
+    statementList RETURN LEFT_BRACKET expression? RIGHT_BRACKET SEMICOLON RIGHT_BRACE; // (7)
 
 parameterList: (variable (COMMA variable)*)?; // (9)
 
 statementList: statement*; // (11)
-statementBlock: LEFT_BRACKET statementList RIGHT_BRACKET;
+statementBlock: LEFT_BRACE statementList RIGHT_BRACE;
 statement: var=IDENTIFIER ASSIGN expression SEMICOLON # assignment // (12)
-    | func=IDENTIFIER LEFT_PAREN argumentList RIGHT_PAREN SEMICOLON # functionCall
+    | func=IDENTIFIER LEFT_BRACKET argumentList RIGHT_BRACKET SEMICOLON # functionCall
     | statementBlock # nestedBlock
     | IF condition true=statementBlock ELSE false=statementBlock # ifElse
     | WHILE condition statementBlock # whileLoop
@@ -62,10 +62,10 @@ COLON: ':';
 
 ASSIGN: '=';
 
-LEFT_BRACKET: '{';
-RIGHT_BRACKET: '}';
-LEFT_PAREN: '(';
-RIGHT_PAREN: ')';
+LEFT_BRACE: '{';
+RIGHT_BRACE: '}';
+LEFT_BRACKET: '(';
+RIGHT_BRACKET: ')';
 // arithmetic
 PLUS: '+';
 MINUS: '-';
