@@ -29,12 +29,13 @@ ifElse: IF condition then=statementBlock ELSE else=statementBlock;
 whileLoop: WHILE condition statementBlock;
 skip_: SKIP_;
 
-expression: left=fragment_ binary_operator right=fragment_
-    | LEFT_BRACKET expression RIGHT_BRACKET
+expression: LEFT_BRACKET expression RIGHT_BRACKET
+    | binary_operation
     | functionCall
     | fragment_
-    ;
+    ; // (13)
 
+binary_operation: left=fragment_ binary_operator right=fragment_;
 binary_operator: (PLUS | MINUS); // (14)
 
 parameterList: (variable (COMMA variable)*)?; // (9)
