@@ -4,7 +4,7 @@ options { caseInsensitive = true; }
 
 prog: declarationList functionList main; // (1)
 
-main: MAIN LEFT_BRACKET declarationList statementBlock RIGHT_BRACKET; // (10)
+main: MAIN LEFT_BRACKET declarationList statementList RIGHT_BRACKET; // (10)
 
 declarationList: (declaration SEMICOLON)*; // (2)
 declaration: varDeclaration | constDeclaration; // (3)
@@ -13,16 +13,16 @@ constDeclaration: CONST variable ASSIGN expression; // (5)
 
 functionList: function*; // (6)
 function: type name=IDENTIFIER LEFT_PAREN parameterList RIGHT_PAREN LEFT_BRACKET declarationList
-    statementBlock RETURN LEFT_PAREN expression? RIGHT_PAREN SEMICOLON RIGHT_BRACKET; // (7)
+    statementList RETURN LEFT_PAREN expression? RIGHT_PAREN SEMICOLON RIGHT_BRACKET; // (7)
 
 parameterList: (variable (COMMA variable)*)?; // (9)
 
-statementBlock: statement*; // (11)
+statementList: statement*; // (11)
 statement: var=IDENTIFIER ASSIGN expression //# assignment // (12)
     | func=IDENTIFIER LEFT_PAREN argumentList //# functionCall
-    | LEFT_BRACKET statementBlock RIGHT_BRACKET
-    | IF condition LEFT_BRACKET statementBlock RIGHT_BRACKET ELSE LEFT_BRACKET statementBlock RIGHT_BRACKET
-    | WHILE condition LEFT_BRACKET statementBlock RIGHT_BRACKET
+    | LEFT_BRACKET statementList RIGHT_BRACKET
+    | IF condition LEFT_BRACKET true=statementList RIGHT_BRACKET ELSE LEFT_BRACKET false=statementList RIGHT_BRACKET
+    | WHILE condition LEFT_BRACKET statementList RIGHT_BRACKET
     | SKIP_ SEMICOLON
     ;
 
