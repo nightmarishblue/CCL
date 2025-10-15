@@ -30,13 +30,17 @@ whileLoop: WHILE condition statementBlock;
 skip_: SKIP_;
 
 expression: LEFT_BRACKET expression RIGHT_BRACKET
-    | binary_operation
+    | expression binary_operator expression
     | functionCall
     | fragment_
     ; // (13)
 
-binary_operation: left=fragment_ binary_operator right=fragment_;
 binary_operator: (PLUS | MINUS); // (14)
+
+fragment_: reference | boolean | number; // (15)
+reference: negated=MINUS? name=IDENTIFIER;
+boolean: value=(TRUE | FALSE);
+number: value=NUMBER;
 
 parameterList: (variable (COMMA variable)*)?; // (9)
 argumentList: (names+=IDENTIFIER (COMMA names+=IDENTIFIER)*)?; // (18) (19)
@@ -47,7 +51,6 @@ variable: name=IDENTIFIER COLON type;
 
 // TODO
 condition:;
-fragment_:;
 
 // reserved keywords
 MAIN: 'MAIN';
@@ -96,7 +99,7 @@ LESS_EQUAL: '<=';
 GREATER_EQUAL: '>=';
 
 // identifiers & literals
-INTEGER_LITERAL: '-'? [1-9] Digit*;
+NUMBER: '-'? [1-9] Digit*;
 IDENTIFIER: (Letter | '_') (Letter | Digit | '_')*;
 
 // ignored characters
