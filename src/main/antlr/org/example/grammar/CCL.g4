@@ -36,7 +36,8 @@ expression
     | fragment_ # primaryExpression
     ; // (13)
 
-binaryArithmeticOperator: (PLUS | MINUS); // (14)
+binaryArithmeticOperator: value=(PLUS | MINUS); // (14)
+comparisonOperator: value=(EQUALS | NOT_EQUALS | LESS_THAN | LESS_EQUAL | GREATER_THAN | GREATER_EQUAL); // (17)
 
 fragment_: reference | boolean | number; // (15)
 reference: negated=MINUS? name=IDENTIFIER;
