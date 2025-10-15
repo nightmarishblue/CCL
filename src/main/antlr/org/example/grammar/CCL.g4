@@ -19,8 +19,8 @@ parameterList: (variable (COMMA variable)*)?; // (9)
 
 statementList: statement*; // (11)
 statementBlock: LEFT_BRACKET statementList RIGHT_BRACKET;
-statement: var=IDENTIFIER ASSIGN expression //# assignment // (12)
-    | func=IDENTIFIER LEFT_PAREN argumentList //# functionCall
+statement: var=IDENTIFIER ASSIGN expression SEMICOLON //# assignment // (12)
+    | func=IDENTIFIER LEFT_PAREN argumentList RIGHT_PAREN SEMICOLON //# functionCall
     | LEFT_BRACKET statementList RIGHT_BRACKET
     | IF condition true=statementBlock ELSE false=statementBlock
     | WHILE condition statementBlock
