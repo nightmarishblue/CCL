@@ -29,13 +29,14 @@ ifElse: IF condition then=statementBlock ELSE else=statementBlock;
 whileLoop: WHILE condition statementBlock;
 skip_: SKIP_;
 
-expression: LEFT_BRACKET expression RIGHT_BRACKET
-    | expression binary_operator expression
-    | functionCall
-    | fragment_
+expression
+    : LEFT_BRACKET expression RIGHT_BRACKET # subExpression
+    | left=expression binaryArithmeticOperator right=expression # arithmeticExpression
+    | functionCall # functionCallExpression
+    | fragment_ # primaryExpression
     ; // (13)
 
-binary_operator: (PLUS | MINUS); // (14)
+binaryArithmeticOperator: (PLUS | MINUS); // (14)
 
 fragment_: reference | boolean | number; // (15)
 reference: negated=MINUS? name=IDENTIFIER;
