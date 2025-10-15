@@ -17,23 +17,32 @@ function: type name=IDENTIFIER LEFT_BRACKET parameterList RIGHT_BRACKET LEFT_BRA
 
 statementList: statement*; // (11)
 statementBlock: LEFT_BRACE statementList RIGHT_BRACE;
-statement: var=IDENTIFIER ASSIGN expression SEMICOLON # assignment // (12)
-    | func=IDENTIFIER LEFT_BRACKET argumentList RIGHT_BRACKET SEMICOLON # functionCall
+statement: var=IDENTIFIER ASSIGN expression SEMICOLON # assignment
+    | functionCall SEMICOLON # procedureCall
     | statementBlock # nestedBlock
     | IF condition true=statementBlock ELSE false=statementBlock # ifElse
     | WHILE condition statementBlock # whileLoop
     | SKIP_ SEMICOLON # skip
+    ; // (12)
+
+expression: left=fragment_ binary_operator right=fragment_
+    | LEFT_BRACKET expression RIGHT_BRACKET
+    | functionCall
+    | fragment_
     ;
+
+binary_operator: (PLUS | MINUS); // (14)
 
 parameterList: (variable (COMMA variable)*)?; // (9)
 argumentList: (names+=IDENTIFIER (COMMA names+=IDENTIFIER)*)?; // (18) (19)
+functionCall: name=IDENTIFIER LEFT_BRACKET argumentList RIGHT_BRACKET;
 
 type: value=(INTEGER | BOOLEAN | VOID); // (8)
 variable: name=IDENTIFIER COLON type;
 
 // TODO
-expression:;
 condition:;
+fragment_:;
 
 // reserved keywords
 MAIN: 'MAIN';
