@@ -12,16 +12,16 @@ varDeclaration: VAR identifier; // (4)
 constDeclaration: CONST identifier ASSIGN expression; // (5)
 
 functionList: function*; // (6)
-
 function: type name=IDENTIFIER LEFT_PAREN parameterList RIGHT_PAREN LEFT_BRACKET declarationList
     statementBlock RETURN LEFT_PAREN expression? RIGHT_PAREN SEMICOLON RIGHT_BRACKET; // (7)
+
+parameterList: (identifier (COMMA identifier)*)?;
 
 type: value=(INTEGER | BOOLEAN | VOID); // (8)
 identifier: name=IDENTIFIER COLON type;
 
 // TODO
 expression:;
-parameterList:;
 statementBlock:;
 
 // reserved keywords
