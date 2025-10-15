@@ -19,12 +19,12 @@ parameterList: (variable (COMMA variable)*)?; // (9)
 
 statementList: statement*; // (11)
 statementBlock: LEFT_BRACKET statementList RIGHT_BRACKET;
-statement: var=IDENTIFIER ASSIGN expression SEMICOLON //# assignment // (12)
-    | func=IDENTIFIER LEFT_PAREN argumentList RIGHT_PAREN SEMICOLON //# functionCall
-    | LEFT_BRACKET statementList RIGHT_BRACKET
-    | IF condition true=statementBlock ELSE false=statementBlock
-    | WHILE condition statementBlock
-    | SKIP_ SEMICOLON
+statement: var=IDENTIFIER ASSIGN expression SEMICOLON # assignment // (12)
+    | func=IDENTIFIER LEFT_PAREN argumentList RIGHT_PAREN SEMICOLON # functionCall
+    | statementBlock # nestedBlock
+    | IF condition true=statementBlock ELSE false=statementBlock # ifElse
+    | WHILE condition statementBlock # whileLoop
+    | SKIP_ SEMICOLON # skip
     ;
 
 type: value=(INTEGER | BOOLEAN | VOID); // (8)
