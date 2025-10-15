@@ -7,10 +7,9 @@ prog: declarationList functionList main; // (1)
 main: MAIN LEFT_BRACKET declarationList statementBlock RIGHT_BRACKET; // (10)
 
 declarationList: (declaration SEMICOLON)*; // (2)
-
 declaration: varDeclaration | constDeclaration; // (3)
-varDeclaration: VAR name=IDENTIFIER COLON type; // (4)
-constDeclaration: CONST name=IDENTIFIER COLON type ASSIGN expression; // (5)
+varDeclaration: VAR identifier; // (4)
+constDeclaration: CONST identifier ASSIGN expression; // (5)
 
 functionList: function*; // (6)
 
@@ -18,6 +17,7 @@ function: type name=IDENTIFIER LEFT_PAREN parameterList RIGHT_PAREN LEFT_BRACKET
     statementBlock RETURN LEFT_PAREN expression? RIGHT_PAREN SEMICOLON RIGHT_BRACKET; // (7)
 
 type: value=(INTEGER | BOOLEAN | VOID); // (8)
+identifier: name=IDENTIFIER COLON type;
 
 // TODO
 expression:;
