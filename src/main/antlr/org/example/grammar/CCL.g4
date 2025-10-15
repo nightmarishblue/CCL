@@ -18,11 +18,12 @@ function: type name=IDENTIFIER LEFT_PAREN parameterList RIGHT_PAREN LEFT_BRACKET
 parameterList: (variable (COMMA variable)*)?; // (9)
 
 statementList: statement*; // (11)
+statementBlock: LEFT_BRACKET statementList RIGHT_BRACKET;
 statement: var=IDENTIFIER ASSIGN expression //# assignment // (12)
     | func=IDENTIFIER LEFT_PAREN argumentList //# functionCall
     | LEFT_BRACKET statementList RIGHT_BRACKET
-    | IF condition LEFT_BRACKET true=statementList RIGHT_BRACKET ELSE LEFT_BRACKET false=statementList RIGHT_BRACKET
-    | WHILE condition LEFT_BRACKET statementList RIGHT_BRACKET
+    | IF condition true=statementBlock ELSE false=statementBlock
+    | WHILE condition statementBlock
     | SKIP_ SEMICOLON
     ;
 
