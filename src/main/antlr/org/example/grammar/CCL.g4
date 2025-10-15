@@ -31,6 +31,13 @@ ifElse: IF condition then=statementBlock ELSE else=statementBlock;
 whileLoop: WHILE condition statementBlock;
 skip_: SKIP_;
 
+condition // (16)
+    : TILDE condition # negatedCondition
+    | LEFT_BRACKET condition RIGHT_BRACKET # subCondition
+    | left=expression comparisonOperator right=expression # comparisonCondition
+    | left=condition logicalOperator right=condition # logicalCondition
+    ;
+
 expression // (13)
     : LEFT_BRACKET expression RIGHT_BRACKET # subExpression
     | left=expression binaryArithmeticOperator right=expression # arithmeticExpression
@@ -40,6 +47,7 @@ expression // (13)
 
 binaryArithmeticOperator: value=(PLUS | MINUS); // (14)
 comparisonOperator: value=(EQUALS | NOT_EQUALS | LESS_THAN | LESS_EQUAL | GREATER_THAN | GREATER_EQUAL); // (17)
+logicalOperator: value=(AND | OR);
 
 fragment_: reference | boolean | number; // (15)
 reference: negated=MINUS? name=IDENTIFIER;
@@ -52,9 +60,6 @@ functionCall: name=IDENTIFIER LEFT_BRACKET argumentList RIGHT_BRACKET;
 
 type: value=(INTEGER | BOOLEAN | VOID); // (8)
 variable: name=IDENTIFIER COLON type;
-
-// TODO
-condition:;
 
 // reserved keywords
 MAIN: 'MAIN';
