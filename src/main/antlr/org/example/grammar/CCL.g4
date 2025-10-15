@@ -15,14 +15,24 @@ functionList: function*; // (6)
 function: type name=IDENTIFIER LEFT_PAREN parameterList RIGHT_PAREN LEFT_BRACKET declarationList
     statementBlock RETURN LEFT_PAREN expression? RIGHT_PAREN SEMICOLON RIGHT_BRACKET; // (7)
 
-parameterList: (variable (COMMA variable)*)?;
+parameterList: (variable (COMMA variable)*)?; // (9)
+
+statementBlock: statement*; // (11)
+statement: var=IDENTIFIER ASSIGN expression //# assignment // (12)
+    | func=IDENTIFIER LEFT_PAREN argumentList //# functionCall
+    | LEFT_BRACKET statementBlock RIGHT_BRACKET
+    | IF condition LEFT_BRACKET statementBlock RIGHT_BRACKET ELSE LEFT_BRACKET statementBlock RIGHT_BRACKET
+    | WHILE condition LEFT_BRACKET statementBlock RIGHT_BRACKET
+    | SKIP_ SEMICOLON
+    ;
 
 type: value=(INTEGER | BOOLEAN | VOID); // (8)
 variable: name=IDENTIFIER COLON type;
 
 // TODO
 expression:;
-statementBlock:;
+argumentList:;
+condition:;
 
 // reserved keywords
 MAIN: 'MAIN';
