@@ -7,9 +7,10 @@ prog: declarationList functionList main; // (1)
 main: MAIN LEFT_BRACE declarationList statementList RIGHT_BRACE; // (10)
 
 declarationList: (declaration SEMICOLON)*; // (2)
-declaration: VAR variable # varDeclaration // (4)
+declaration // (3)
+    : VAR variable # varDeclaration // (4)
     | CONST variable ASSIGN expression # constDeclaration // (5)
-    ; // (3)
+    ;
 
 functionList: function*; // (6)
 function: type name=IDENTIFIER LEFT_BRACKET parameterList RIGHT_BRACKET LEFT_BRACE declarationList
@@ -17,11 +18,12 @@ function: type name=IDENTIFIER LEFT_BRACKET parameterList RIGHT_BRACKET LEFT_BRA
 
 statementList: statement*; // (11)
 statementBlock: LEFT_BRACE statementList RIGHT_BRACE;
-statement: statementBlock
+statement // (12)
+    : statementBlock
     | (assignment | functionCall | skip_) SEMICOLON
     | ifElse
     | whileLoop
-    ; // (12)
+    ;
 
 assignment: var=IDENTIFIER ASSIGN expression;
 
@@ -29,12 +31,12 @@ ifElse: IF condition then=statementBlock ELSE else=statementBlock;
 whileLoop: WHILE condition statementBlock;
 skip_: SKIP_;
 
-expression
+expression // (13)
     : LEFT_BRACKET expression RIGHT_BRACKET # subExpression
     | left=expression binaryArithmeticOperator right=expression # arithmeticExpression
     | functionCall # functionCallExpression
     | fragment_ # primaryExpression
-    ; // (13)
+    ;
 
 binaryArithmeticOperator: value=(PLUS | MINUS); // (14)
 comparisonOperator: value=(EQUALS | NOT_EQUALS | LESS_THAN | LESS_EQUAL | GREATER_THAN | GREATER_EQUAL); // (17)
