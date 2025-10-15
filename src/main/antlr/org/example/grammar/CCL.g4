@@ -17,13 +17,17 @@ function: type name=IDENTIFIER LEFT_BRACKET parameterList RIGHT_BRACKET LEFT_BRA
 
 statementList: statement*; // (11)
 statementBlock: LEFT_BRACE statementList RIGHT_BRACE;
-statement: var=IDENTIFIER ASSIGN expression SEMICOLON # assignment
-    | functionCall SEMICOLON # procedureCall
-    | statementBlock # nestedBlock
-    | IF condition true=statementBlock ELSE false=statementBlock # ifElse
-    | WHILE condition statementBlock # whileLoop
-    | SKIP_ SEMICOLON # skip
+statement: statementBlock
+    | (assignment | functionCall | skip_) SEMICOLON
+    | ifElse
+    | whileLoop
     ; // (12)
+
+assignment: var=IDENTIFIER ASSIGN expression;
+
+ifElse: IF condition then=statementBlock ELSE else=statementBlock;
+whileLoop: WHILE condition statementBlock;
+skip_: SKIP_;
 
 expression: left=fragment_ binary_operator right=fragment_
     | LEFT_BRACKET expression RIGHT_BRACKET
