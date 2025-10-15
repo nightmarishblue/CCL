@@ -7,9 +7,9 @@ prog: declarationList functionList main; // (1)
 main: MAIN LEFT_BRACE declarationList statementList RIGHT_BRACE; // (10)
 
 declarationList: (declaration SEMICOLON)*; // (2)
-declaration: varDeclaration | constDeclaration; // (3)
-varDeclaration: VAR variable; // (4)
-constDeclaration: CONST variable ASSIGN expression; // (5)
+declaration: VAR variable # varDeclaration // (4)
+    | CONST variable ASSIGN expression # constDeclaration // (5)
+    ; // (3)
 
 functionList: function*; // (6)
 function: type name=IDENTIFIER LEFT_BRACKET parameterList RIGHT_BRACKET LEFT_BRACE declarationList
