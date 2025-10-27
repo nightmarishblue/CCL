@@ -4,17 +4,17 @@ options { caseInsensitive = true; }
 
 prog: declarationList functionList main; // (1)
 
-main: MAIN LEFT_BRACE declarationList statementList RIGHT_BRACE; // (10)
+main: KW_MAIN LEFT_BRACE declarationList statementList RIGHT_BRACE; // (10)
 
 declarationList: (declaration SEMICOLON)*; // (2)
 declaration // (3)
-    : VAR variable # varDeclaration // (4)
-    | CONST variable ASSIGN expression # constDeclaration // (5)
+    : KW_VAR variable # varDeclaration // (4)
+    | KW_CONST variable ASSIGN expression # constDeclaration // (5)
     ;
 
 functionList: function*; // (6)
 function: type name=IDENTIFIER LEFT_BRACKET parameterList RIGHT_BRACKET LEFT_BRACE declarationList
-    statementList RETURN LEFT_BRACKET expression? RIGHT_BRACKET SEMICOLON RIGHT_BRACE; // (7)
+    statementList KW_RETURN LEFT_BRACKET expression? RIGHT_BRACKET SEMICOLON RIGHT_BRACE; // (7)
 
 statementList: statement*; // (11)
 statementBlock: LEFT_BRACE statementList RIGHT_BRACE;
@@ -27,9 +27,9 @@ statement // (12)
 
 assignment: var=IDENTIFIER ASSIGN expression;
 
-ifElse: IF condition then=statementBlock ELSE else=statementBlock;
-whileLoop: WHILE condition statementBlock;
-skip_: SKIP_;
+ifElse: KW_IF condition then=statementBlock KW_ELSE else=statementBlock;
+whileLoop: KW_WHILE condition statementBlock;
+skip_: KW_SKIP;
 
 condition // (16)
     : TILDE condition # negatedCondition
@@ -51,35 +51,35 @@ logicalOperator: value=(AND | OR);
 
 fragment_: reference | boolean | number; // (15)
 reference: negated=MINUS? name=IDENTIFIER;
-boolean: value=(TRUE | FALSE);
+boolean: value=(KW_TRUE | KW_FALSE);
 number: value=NUMBER;
 
 parameterList: (variable (COMMA variable)*)?; // (9)
 argumentList: (names+=IDENTIFIER (COMMA names+=IDENTIFIER)*)?; // (18) (19)
 functionCall: name=IDENTIFIER LEFT_BRACKET argumentList RIGHT_BRACKET;
 
-type: value=(INTEGER | BOOLEAN | VOID); // (8)
+type: value=(KW_INTEGER | KW_BOOLEAN | KW_VOID); // (8)
 variable: name=IDENTIFIER COLON type;
 
 // reserved keywords
-MAIN: 'MAIN';
-RETURN: 'RETURN';
+KW_MAIN: 'MAIN';
+KW_RETURN: 'RETURN';
 
-INTEGER: 'INTEGER';
-BOOLEAN: 'BOOLEAN';
-VOID: 'VOID';
+KW_INTEGER: 'INTEGER';
+KW_BOOLEAN: 'BOOLEAN';
+KW_VOID: 'VOID';
 
-VAR: 'VAR';
-CONST: 'CONST';
+KW_VAR: 'VAR';
+KW_CONST: 'CONST';
 
-IF: 'IF';
-ELSE: 'ELSE';
+KW_IF: 'IF';
+KW_ELSE: 'ELSE';
 
-TRUE: 'TRUE';
-FALSE: 'FALSE';
+KW_TRUE: 'TRUE';
+KW_FALSE: 'FALSE';
 
-WHILE: 'WHILE';
-SKIP_: 'SKIP';
+KW_WHILE: 'WHILE';
+KW_SKIP: 'SKIP';
 
 // symbols & operators
 COMMA: ',';
