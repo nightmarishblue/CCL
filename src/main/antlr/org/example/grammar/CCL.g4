@@ -16,20 +16,16 @@ functionList: function*; // (6)
 function: type name=IDENTIFIER LEFT_BRACKET parameterList RIGHT_BRACKET LEFT_BRACE declarationList
     statementList KW_RETURN LEFT_BRACKET expression? RIGHT_BRACKET SEMICOLON RIGHT_BRACE; // (7)
 
-statementList: statement*; // (11)
+statementList: statement*; // (11) (referred to as statementBlock in the spec)
 statementBlock: LEFT_BRACE statementList RIGHT_BRACE;
 statement // (12)
-    : statementBlock
-    | (assignment | functionCall | skip_) SEMICOLON
-    | ifElse
-    | whileLoop
+    : statementBlock # nestedBlockStatement
+    | functionCall SEMICOLON # functionCallStatement
+    | var=IDENTIFIER ASSIGN expression SEMICOLON # assignmentStatement
+    | KW_SKIP SEMICOLON # skipStatement
+    | KW_IF condition then=statementBlock KW_ELSE else=statementBlock # ifStatement
+    | KW_WHILE condition statementBlock # whileStatement
     ;
-
-assignment: var=IDENTIFIER ASSIGN expression;
-
-ifElse: KW_IF condition then=statementBlock KW_ELSE else=statementBlock;
-whileLoop: KW_WHILE condition statementBlock;
-skip_: KW_SKIP;
 
 condition // (16)
     : TILDE condition # negatedCondition
