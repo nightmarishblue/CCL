@@ -1,6 +1,9 @@
 .*
 !.gitignore
 
+# ANTLR
+src/main/gen
+
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
