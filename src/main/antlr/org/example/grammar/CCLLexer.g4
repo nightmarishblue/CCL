@@ -2,6 +2,9 @@ lexer grammar CCLLexer;
 
 options { caseInsensitive = true; } // spec says the language is not case sensitive
 
+fragment Digit: [0-9];
+fragment Letter: [A-Z];
+
 // reserved keywords
 KW_MAIN: 'MAIN';
 KW_RETURN: 'RETURN';
@@ -54,11 +57,16 @@ IDENTIFIER: (Letter | '_') (Letter | Digit | '_')*;
 
 // ignored characters
 WHITESPACE: [ \t\n\r]+ -> skip;
-
-BLOCK_COMMENT: '/*' .*? '*/' -> skip; // TODO add a stack to this to allow for nested comments
 LINE_COMMENT: '//' .*? '\n' -> skip;
 
 ILLEGAL: .; // grammar is not sound if we match this
 
-fragment Digit: [0-9];
-fragment Letter: [A-Z];
+BLOCK_COMMENT_START: '/*' -> pushMode(BLOCK_COMMENT), skip;
+
+mode BLOCK_COMMENT;
+
+NESTED_BLOCK_COMMENT_START: '/*' -> pushMode(BLOCK_COMMENT), skip;
+
+BLOCK_COMMENT_END: '*/' -> popMode, skip;
+
+BLOCK_COMMENT_CONTENT: . -> skip;
