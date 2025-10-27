@@ -38,17 +38,22 @@ expression // (13)
     : LEFT_BRACKET expression RIGHT_BRACKET # subExpression
     | left=expression binaryArithmeticOperator right=expression # arithmeticExpression
     | functionCall # functionCallExpression
-    | fragment_ # primaryExpression
+    | atom # atomExpression
     ;
 
 binaryArithmeticOperator: value=(PLUS | MINUS); // (14)
 comparisonOperator: value=(EQUALS | NOT_EQUALS | LESS_THAN | LESS_EQUAL | GREATER_THAN | GREATER_EQUAL); // (17)
 logicalOperator: value=(AND | OR);
 
-fragment_: reference | boolean | number; // (15)
-reference: negated=MINUS? name=IDENTIFIER;
-boolean: value=(KW_TRUE | KW_FALSE);
-number: value=NUMBER;
+atom // (15) (referred to as fragment in the spec, which is unfortunately an ANTLR-reserved keyword)
+    : unaryOperator=MINUS? name=IDENTIFIER # referenceAtom
+    | literal # literalAtom
+    ;
+
+literal
+    : value=(KW_TRUE | KW_FALSE) # booleanLiteral
+    | value=NUMBER # integerLiteral
+    ;
 
 parameterList: (variable (COMMA variable)*)?; // (9)
 argumentList: (names+=IDENTIFIER (COMMA names+=IDENTIFIER)*)?; // (18) (19)
