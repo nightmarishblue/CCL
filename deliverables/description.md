@@ -1,5 +1,5 @@
+The following is a basic summary of the design decisions I made when creating the lexical analyser and parser. The source files are adapted from my [repository](https://gitlab.computing.dcu.ie/bastibn2/CCL) to be compiled manually.
 # Grammar
-The CCL grammar is split into `CCLParser.g4` and `CCLLexer.g4`.
 ## Parser
 For reasons explained later, I split the grammar into multiple `.g4` files. The `tokenVocab` option gives the name of the lexer grammar.
 
