@@ -1,16 +1,17 @@
 package org.example.ast;
 
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.example.grammar.CCLParser;
 
 import java.util.List;
 
 public class Program extends Node {
-    List<Declaration> declarations;
+    final List<Declaration> declarations;
     List<Function> functions;
 
     Main main;
 
-    public Program(ParserRuleContext ctx) {
+    public Program(CCLParser.ProgramContext ctx) {
         super(ctx);
+        declarations = ctx.declarationList().declaration().stream().map(Declaration::new).toList();
     }
 }

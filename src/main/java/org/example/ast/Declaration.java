@@ -2,7 +2,8 @@ package org.example.ast;
 
 import org.example.grammar.CCLParser;
 
-public abstract class Declaration extends Node {
+// TODO make this abstract again
+public class Declaration extends Node {
     final Identifier name;
     final Type type;
 
