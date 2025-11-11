@@ -1,5 +1,6 @@
 package org.example.ast;
 
+import org.example.ast.declaration.Declaration;
 import org.example.grammar.CCLParser;
 
 import java.util.List;

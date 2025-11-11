@@ -1,6 +1,7 @@
 package org.example.ast;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.example.ast.declaration.Declaration;
 
 import java.util.List;
 

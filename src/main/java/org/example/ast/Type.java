@@ -8,7 +8,7 @@ public enum Type {
     INTEGER,
     BOOLEAN;
 
-    static Type fromToken(final Token token) {
+    public static Type fromToken(final Token token) {
         int index = token.getType();
         return switch (index) {
             case CCLParser.KW_VOID -> VOID;
@@ -18,7 +18,7 @@ public enum Type {
         };
     }
 
-    static Type fromContext(final CCLParser.TypeContext context) {
+    public static Type fromContext(final CCLParser.TypeContext context) {
         return fromToken(context.value);
     }
 }

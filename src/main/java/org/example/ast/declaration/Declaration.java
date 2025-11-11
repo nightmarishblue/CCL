@@ -1,5 +1,8 @@
-package org.example.ast;
+package org.example.ast.declaration;
 
+import org.example.ast.Identifier;
+import org.example.ast.Node;
+import org.example.ast.Type;
 import org.example.grammar.CCLParser;
 
 // TODO make this abstract again
