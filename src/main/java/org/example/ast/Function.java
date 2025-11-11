@@ -6,8 +6,8 @@ import java.util.List;
 
 public class Function extends Node {
     // TODO add type (probably enum)?
-    String name;
-    List<String> parameters;
+    Identifier name;
+    List<Identifier> parameters;
     // TODO add the
     List<Declaration> declarations;
 
