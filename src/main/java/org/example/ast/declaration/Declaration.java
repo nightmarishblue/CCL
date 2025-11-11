@@ -5,17 +5,24 @@ import org.example.ast.Node;
 import org.example.ast.Type;
 import org.example.grammar.CCLParser;
 
-// TODO make this abstract again
-public class Declaration extends Node {
+public abstract class Declaration extends Node {
     final Identifier name;
     final Type type;
 
-    public Declaration(CCLParser.DeclarationContext ctx) {
+    public Declaration(final CCLParser.DeclarationContext ctx) {
         super(ctx);
         final CCLParser.VariableContext variable = ctx.getRuleContext(CCLParser.VariableContext.class, 0);
 
         name = new Identifier(variable.name.getText());
         type = Type.fromContext(variable.type());
     }
-    // TODO add subclasses for const and var declarations?
+
+    public static Declaration fromContext(final CCLParser.DeclarationContext ctx) {
+        return switch (ctx) {
+            case CCLParser.VarDeclarationContext varCtx -> new Var(varCtx);
+            case CCLParser.ConstDeclarationContext constCtx -> new Const(constCtx);
+            case CCLParser.DeclarationContext ignored ->
+                    throw new IllegalArgumentException("DeclarationContext can't be passed to fromContext");
+        };
+    }
 }
