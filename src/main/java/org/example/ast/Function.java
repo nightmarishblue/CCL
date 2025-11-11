@@ -1,5 +1,7 @@
 package org.example.ast;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+
 import java.util.List;
 
 public class Function extends Node {
@@ -8,6 +10,10 @@ public class Function extends Node {
     List<String> parameters;
     // TODO add the
     List<Declaration> declarations;
+
+    public Function(ParserRuleContext ctx) {
+        super(ctx);
+    }
     // TODO add statements
     // TODO add output (expression)
 }
