@@ -1,4 +1,4 @@
-package org.example.ast;
+package org.example.ast.data;
 
 import org.antlr.v4.runtime.Token;
 import org.example.grammar.CCLParser;

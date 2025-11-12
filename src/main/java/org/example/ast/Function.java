@@ -1,5 +1,8 @@
 package org.example.ast;
 
+import org.example.ast.data.Identifier;
+import org.example.ast.data.Type;
+import org.example.ast.data.Variable;
 import org.example.ast.declaration.Declaration;
 import org.example.grammar.CCLParser;
 

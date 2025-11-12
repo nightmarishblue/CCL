@@ -1,4 +1,4 @@
-package org.example.ast;
+package org.example.ast.data;
 
 import org.example.grammar.CCLParser;
 
