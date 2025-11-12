@@ -5,6 +5,7 @@ import org.example.ast.data.Type;
 import org.example.ast.data.Variable;
 import org.example.ast.declaration.Declaration;
 import org.example.ast.expression.Expression;
+import org.example.ast.statement.Statement;
 import org.example.grammar.CCLParser;
 
 import java.util.List;
@@ -12,17 +13,24 @@ import java.util.List;
 public class Function extends Node {
     public final Type type;
     public final Identifier name;
+
     public final List<Variable> parameters;
+
     public final List<Declaration> declarations;
+    public final List<Statement> statements;
+
     public final Expression output;
 
     public Function(CCLParser.FunctionContext ctx) {
         super(ctx);
         type = Type.fromContext(ctx.type());
         name = new Identifier(ctx.name.getText());
+
         parameters = ctx.parameterList().variable().stream().map(Variable::new).toList();
+
         declarations = ctx.declarationList().declaration().stream().map(Declaration::fromContext).toList();
+        statements = ctx.statementList().statement().stream().map(Statement::fromContext).toList();
+
         output = Expression.fromContext(ctx.output);
     }
-    // TODO add statements
 }
