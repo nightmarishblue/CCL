@@ -7,8 +7,10 @@ import org.example.ast.declaration.Declaration;
 import org.example.ast.expression.Expression;
 import org.example.ast.statement.Statement;
 import org.example.grammar.CCLParser;
+import org.example.helper.Option;
 
 import java.util.List;
+import java.util.Optional;
 
 public class Function extends Node {
     public final Type type;
@@ -19,7 +21,7 @@ public class Function extends Node {
     public final List<Declaration> declarations;
     public final List<Statement> statements;
 
-    public final Expression output;
+    public final Option<Expression> output;
 
     public Function(CCLParser.FunctionContext ctx) {
         super(ctx);
@@ -31,6 +33,8 @@ public class Function extends Node {
         declarations = ctx.declarationList().declaration().stream().map(Declaration::fromContext).toList();
         statements = ctx.statementList().statement().stream().map(Statement::fromContext).toList();
 
-        output = Expression.fromContext(ctx.output);
+        output = ctx.output != null
+                ? Option.some(Expression.fromContext(ctx.output))
+                : Option.none();
     }
 }
