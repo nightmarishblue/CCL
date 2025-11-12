@@ -1,9 +1,9 @@
-package org.example.ast.literal;
+package org.example.ast.atom.literal;
 
-import org.example.ast.Node;
+import org.example.ast.atom.Atom;
 import org.example.grammar.CCLParser;
 
-public abstract class Literal extends Node {
+public abstract class Literal extends Atom {
     public Literal(CCLParser.LiteralContext ctx) {
         super(ctx);
     }
