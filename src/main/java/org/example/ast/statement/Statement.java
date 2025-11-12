@@ -13,6 +13,7 @@ public abstract class Statement extends Node {
             case CCLParser.NestedBlockStatementContext ctx_ -> new Block(ctx_);
             case CCLParser.AssignmentStatementContext ctx_ -> new Assign(ctx_);
             case CCLParser.FunctionCallStatementContext ctx_ -> new Discard(ctx_);
+            case CCLParser.SkipStatementContext ctx_ -> new Skip(ctx_);
             case CCLParser.StatementContext ctx_ -> null; // TODO replace with a throw
         };
     }
