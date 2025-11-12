@@ -14,7 +14,7 @@ public class Program extends Node {
     public Program(CCLParser.ProgramContext ctx) {
         super(ctx);
         declarations = ctx.declarationList().declaration().stream().map(Declaration::fromContext).toList();
-
+        functions = ctx.functionList().function().stream().map(Function::new).toList();
         main = new Main(ctx.main());
     }
 }
