@@ -6,7 +6,7 @@ import org.example.grammar.CCLParser;
 import java.util.List;
 
 public class Main extends Node {
-    List<Declaration> declarations;
+    public final List<Declaration> declarations;
 
     public Main(CCLParser.MainContext ctx) {
         super(ctx);

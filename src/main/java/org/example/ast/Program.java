@@ -7,9 +7,9 @@ import java.util.List;
 
 public class Program extends Node {
     final List<Declaration> declarations;
-    List<Function> functions;
+    public final List<Function> functions;
 
-    Main main;
+    public final Main main;
 
     public Program(CCLParser.ProgramContext ctx) {
         super(ctx);

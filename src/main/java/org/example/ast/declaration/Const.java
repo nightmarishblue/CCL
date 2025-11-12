@@ -4,7 +4,7 @@ import org.example.ast.expression.Expression;
 import org.example.grammar.CCLParser;
 
 public class Const extends Declaration {
-    final Expression value;
+    public final Expression value;
 
     public Const(CCLParser.ConstDeclarationContext ctx) {
         super(ctx);

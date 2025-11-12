@@ -10,11 +10,11 @@ import org.example.grammar.CCLParser;
 import java.util.List;
 
 public class Function extends Node {
-    final Type type;
-    final Identifier name;
-    final List<Variable> parameters;
-    final List<Declaration> declarations;
-    final Expression output;
+    public final Type type;
+    public final Identifier name;
+    public final List<Variable> parameters;
+    public final List<Declaration> declarations;
+    public final Expression output;
 
     public Function(CCLParser.FunctionContext ctx) {
         super(ctx);
