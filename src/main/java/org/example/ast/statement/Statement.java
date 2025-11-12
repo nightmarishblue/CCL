@@ -15,7 +15,9 @@ public abstract class Statement extends Node {
             case CCLParser.FunctionCallStatementContext ctx_ -> new Discard(ctx_);
             case CCLParser.SkipStatementContext ctx_ -> new Skip(ctx_);
             case CCLParser.IfStatementContext ctx_ -> new IfElse(ctx_);
-            case CCLParser.StatementContext ctx_ -> null; // TODO replace with a throw
+            case CCLParser.WhileStatementContext ctx_ -> new While(ctx_);
+            case CCLParser.StatementContext ctx_ ->
+                    throw new IllegalArgumentException(String.format("Subclass of %s is required", ctx_.getClass().getSimpleName()));
         };
     }
 }
