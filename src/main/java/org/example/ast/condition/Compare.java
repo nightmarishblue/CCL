@@ -37,7 +37,7 @@ public class Compare extends Condition {
                 case CCLParser.LESS_EQUAL -> LESS_EQUAL;
                 case CCLParser.GREATER_THAN -> GREATER_THAN;
                 case CCLParser.GREATER_EQUAL -> GREATER_EQUAL;
-                default -> throw new IllegalArgumentException("Can't construct operator from " + token);
+                default -> throw new IllegalArgumentException("Can't construct comparison operator from " + token);
             };
         }
     }
