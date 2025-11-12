@@ -13,7 +13,13 @@ public abstract class Expression extends Node {
         this(ctx.expression());
     }
 
-    public static Expression fromContext(CCLParser.ExpressionContext ctx) {
-        return null; // TODO implement
+    public static <T extends CCLParser.ExpressionContext> Expression fromContext(T ctx) {
+        return switch (ctx) {
+            case CCLParser.ArithmeticExpressionContext ctx_ -> Arithmetic.fromContext(ctx_);
+            // TODO add the rest
+//            case CCLParser.ExpressionContext ignored ->
+//                    throw new IllegalArgumentException("Cannot create Expression from ExpressionContext");
+            default -> null;
+        };
     }
 }
