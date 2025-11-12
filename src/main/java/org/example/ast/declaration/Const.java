@@ -10,6 +10,6 @@ public class Const extends Declaration {
 
     @Override
     public String toString() {
-        return String.format("%s(%s:%s=)", Const.class.getSimpleName(), this.name, this.type);
+        return String.format("%s(%s=)", Const.class.getSimpleName(), variable);
     }
 }

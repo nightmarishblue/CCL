@@ -9,6 +9,6 @@ public class Var extends Declaration {
 
     @Override
     public String toString() {
-        return String.format("%s(%s:%s)", Var.class.getSimpleName(), this.name, this.type);
+        return String.format("%s(%s)", Var.class.getSimpleName(), variable);
     }
 }
