@@ -3,7 +3,7 @@ package org.example.ast.expression;
 import org.example.grammar.CCLParser;
 
 public abstract class Arithmetic extends Expression {
-    final Expression left, right;
+    public final Expression left, right;
 
     public Arithmetic(CCLParser.ArithmeticExpressionContext ctx) {
         super(ctx);
