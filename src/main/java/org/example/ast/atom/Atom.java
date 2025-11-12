@@ -16,7 +16,8 @@ public abstract class Atom extends Node {
         return switch (ctx) {
             case CCLParser.ReferenceAtomContext ctx_ -> new Reference(ctx_);
             case CCLParser.LiteralAtomContext ctx_ -> Literal.fromContext(ctx_.literal());
-            default -> throw new IllegalArgumentException("Can't construct Atom from " + ctx);
+            case CCLParser.AtomContext ctx_ ->
+                 throw new IllegalArgumentException(String.format("Subclass of %s is required", ctx_.getClass().getSimpleName()));
         };
     }
 }

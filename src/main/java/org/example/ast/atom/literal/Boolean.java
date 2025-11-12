@@ -14,9 +14,4 @@ public class Boolean extends Literal {
             default -> throw new IllegalArgumentException("Invalid token type " + type);
         };
     }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
-    }
 }

@@ -1,6 +1,7 @@
 package org.example.ast.expression;
 
 import org.example.ast.Node;
+import org.example.ast.atom.Atom;
 import org.example.grammar.CCLParser;
 
 public abstract class Expression extends Node {
@@ -14,10 +15,9 @@ public abstract class Expression extends Node {
             case CCLParser.SubExpressionContext ctx_ -> Expression.fromContext(ctx_.expression());
             case CCLParser.ArithmeticExpressionContext ctx_ -> Arithmetic.fromContext(ctx_);
             case CCLParser.FunctionCallExpressionContext ctx_ -> new Result(ctx_);
-            // TODO add the rest
-//            case CCLParser.ExpressionContext ignored ->
-//                    throw new IllegalArgumentException("Cannot create Expression from ExpressionContext");
-            default -> null;
+            case CCLParser.AtomExpressionContext ctx_ -> new Value(ctx_);
+            case CCLParser.ExpressionContext ctx_ ->
+                    throw new IllegalArgumentException(String.format("Subclass of %s is required", ctx_.getClass().getSimpleName()));
         };
     }
 }

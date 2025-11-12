@@ -11,7 +11,7 @@ public class Reference extends Atom {
     public Reference(CCLParser.ReferenceAtomContext ctx) {
         super(ctx);
         variable = new Identifier(ctx.name);
-        negate = ctx.unaryOperator().value != null; // currently the only unary operator allowed is minus
+        negate = ctx.unaryOperator() != null; // currently the only unary operator allowed is minus
     }
 
     @Override
