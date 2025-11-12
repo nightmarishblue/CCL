@@ -12,4 +12,8 @@ public abstract class Expression extends Node {
     public Expression(CCLParser.SubExpressionContext ctx) {
         this(ctx.expression());
     }
+
+    public static Expression fromContext(CCLParser.ExpressionContext ctx) {
+        return null; // TODO implement
+    }
 }
