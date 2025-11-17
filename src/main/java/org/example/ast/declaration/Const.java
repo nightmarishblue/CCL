@@ -1,14 +1,14 @@
 package org.example.ast.declaration;
 
+import org.example.ast.data.Variable;
 import org.example.ast.expression.Expression;
-import org.example.grammar.CCLParser;
 
 public class Const extends Declaration {
     public final Expression value;
 
-    public Const(CCLParser.ConstDeclarationContext ctx) {
-        super(ctx);
-        value = Expression.fromContext(ctx.expression());
+    public Const(Variable variable, Expression value) {
+        super(variable);
+        this.value = value;
     }
 
     @Override

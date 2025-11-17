@@ -6,7 +6,6 @@ import org.example.ast.data.Variable;
 import org.example.ast.declaration.Declaration;
 import org.example.ast.expression.Expression;
 import org.example.ast.statement.Statement;
-import org.example.grammar.CCLParser;
 import org.example.helper.Option;
 
 import java.util.List;
@@ -22,17 +21,12 @@ public class Function extends Node {
 
     public final Option<Expression> output;
 
-    public Function(CCLParser.FunctionContext ctx) {
-        type = Type.fromContext(ctx.type());
-        name = new Identifier(ctx.name.getText());
-
-        parameters = ctx.parameterList().variable().stream().map(Variable::new).toList();
-
-        declarations = ctx.declarationList().declaration().stream().map(Declaration::fromContext).toList();
-        statements = ctx.statementList().statement().stream().map(Statement::fromContext).toList();
-
-        output = ctx.output != null
-                ? Option.some(Expression.fromContext(ctx.output))
-                : Option.none();
+    public Function(Type type, Identifier name, List<Variable> parameters, List<Declaration> declarations, List<Statement> statements, Option<Expression> output) {
+        this.type = type;
+        this.name = name;
+        this.parameters = parameters;
+        this.declarations = declarations;
+        this.statements = statements;
+        this.output = output;
     }
 }

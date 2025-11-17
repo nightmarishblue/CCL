@@ -4,14 +4,14 @@ import org.antlr.v4.runtime.Token;
 import org.example.grammar.CCLParser;
 
 public class Logic extends Condition {
-    public final Condition left, right;
+    public final Condition left;
     public final Operator operator;
+    public final Condition right;
 
-    public Logic(CCLParser.CompoundConditionContext ctx) {
-        super();
-        left = Condition.fromContext(ctx.left);
-        operator = Operator.fromToken(ctx.logicalOperator().value);
-        right = Condition.fromContext(ctx.right);
+    public Logic(Condition left, Operator operator, Condition right) {
+        this.left = left;
+        this.operator = operator;
+        this.right = right;
     }
 
     @Override

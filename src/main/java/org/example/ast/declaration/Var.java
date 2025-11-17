@@ -1,10 +1,10 @@
 package org.example.ast.declaration;
 
-import org.example.grammar.CCLParser;
+import org.example.ast.data.Variable;
 
 public class Var extends Declaration {
-    public Var(CCLParser.VarDeclarationContext ctx) {
-        super(ctx);
+    public Var(Variable variable) {
+        super(variable);
     }
 
     @Override

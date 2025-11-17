@@ -4,14 +4,14 @@ import org.antlr.v4.runtime.Token;
 import org.example.grammar.CCLParser;
 
 public class Arithmetic extends Expression {
-    public final Expression left, right;
+    public final Expression left;
     public final Operator operator;
+    public final Expression right;
 
-    public Arithmetic(CCLParser.ArithmeticExpressionContext ctx) {
-        super();
-        left = Expression.fromContext(ctx.left);
-        operator = Operator.fromToken(ctx.binaryArithmeticOperator().value);
-        right = Expression.fromContext(ctx.right);
+    public Arithmetic(Expression left, Operator operator, Expression right) {
+        this.left = left;
+        this.right = right;
+        this.operator = operator;
     }
 
     @Override

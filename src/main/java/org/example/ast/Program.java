@@ -1,7 +1,6 @@
 package org.example.ast;
 
 import org.example.ast.declaration.Declaration;
-import org.example.grammar.CCLParser;
 
 import java.util.List;
 
@@ -11,9 +10,9 @@ public class Program extends Node {
 
     public final Main main;
 
-    public Program(CCLParser.ProgramContext ctx) {
-        declarations = ctx.declarationList().declaration().stream().map(Declaration::fromContext).toList();
-        functions = ctx.functionList().function().stream().map(Function::new).toList();
-        main = new Main(ctx.main());
+    public Program(List<Declaration> declarations, List<Function> functions, Main main) {
+        this.declarations = declarations;
+        this.functions = functions;
+        this.main = main;
     }
 }

@@ -5,14 +5,14 @@ import org.example.ast.expression.Expression;
 import org.example.grammar.CCLParser;
 
 public class Compare extends Condition {
-    public final Expression left, right;
+    public final Expression left;
     public final Operator operator;
+    public final Expression right;
 
-    public Compare(CCLParser.ComparisonConditionContext ctx) {
-        super();
-        left = Expression.fromContext(ctx.left);
-        operator = Operator.fromToken(ctx.comparisonOperator().value);
-        right = Expression.fromContext(ctx.right);
+    public Compare(Expression left, Operator operator, Expression right) {
+        this.left = left;
+        this.operator = operator;
+        this.right = right;
     }
 
     @Override
