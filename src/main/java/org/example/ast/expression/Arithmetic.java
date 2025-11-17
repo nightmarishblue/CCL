@@ -1,5 +1,6 @@
 package org.example.ast.expression;
 
+import org.antlr.v4.runtime.Token;
 import org.example.grammar.CCLParser;
 
 public abstract class Arithmetic extends Expression {
@@ -24,5 +25,18 @@ public abstract class Arithmetic extends Expression {
     @Override
     public String toString() {
         return String.format("%s(%s, %s)", this.getClass().getSimpleName(), left, right);
+    }
+
+    public enum Operator {
+        PLUS, MINUS;
+
+        public static Operator fromToken(final Token token) {
+            final int type = token.getType();
+            return switch (type) {
+                case CCLParser.PLUS -> PLUS;
+                case CCLParser.MINUS -> MINUS;
+                default -> throw new IllegalArgumentException("Can't construct arithmetic operator from " + token);
+            };
+        }
     }
 }
