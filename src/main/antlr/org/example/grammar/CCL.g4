@@ -1,6 +1,6 @@
-parser grammar CCLParser;
+grammar CCL;
 
-options { tokenVocab = CCLLexer; }
+options { caseInsensitive = true; } // spec says the language is not case sensitive
 
 program: declarationList functionList main; // (1)
 
@@ -66,3 +66,64 @@ comparisonOperator: value=(EQUALS | NOT_EQUALS | LESS_THAN | LESS_EQUAL | GREATE
 logicalOperator: value=(AND | OR);
 
 argumentList: (names+=IDENTIFIER (COMMA names+=IDENTIFIER)*)?; // (18) (19)
+
+
+fragment Digit: [0-9];
+fragment Letter: [A-Z];
+
+// reserved keywords
+KW_MAIN: 'MAIN';
+KW_RETURN: 'RETURN';
+
+KW_INTEGER: 'INTEGER';
+KW_BOOLEAN: 'BOOLEAN';
+KW_VOID: 'VOID';
+
+KW_VAR: 'VAR';
+KW_CONST: 'CONST';
+
+KW_IF: 'IF';
+KW_ELSE: 'ELSE';
+
+KW_TRUE: 'TRUE';
+KW_FALSE: 'FALSE';
+
+KW_WHILE: 'WHILE';
+KW_SKIP: 'SKIP';
+
+// symbols & operators
+COMMA: ',';
+SEMICOLON: ';';
+COLON: ':';
+
+ASSIGN: '=';
+
+LEFT_BRACE: '{';
+RIGHT_BRACE: '}';
+LEFT_BRACKET: '(';
+RIGHT_BRACKET: ')';
+// arithmetic
+PLUS: '+';
+MINUS: '-';
+TILDE: '~';
+// logical
+OR: '||';
+AND: '&&';
+// comparison
+EQUALS: '==';
+NOT_EQUALS: '!=';
+LESS_THAN: '<';
+GREATER_THAN: '>';
+LESS_EQUAL: '<=';
+GREATER_EQUAL: '>=';
+
+// identifiers & literals
+NUMBER: '0' | '-'? [1-9] Digit*; // rules-as-written the spec would disallow literal 0, which I have opted not to do
+IDENTIFIER: (Letter | '_') (Letter | Digit | '_')*;
+
+// ignored characters
+WHITESPACE: [ \t\n\r]+ -> skip;
+LINE_COMMENT: '//' .*? '\n' -> skip;
+BLOCK_COMMENT: '/*' (BLOCK_COMMENT | .)*? '*/' -> skip;
+
+ILLEGAL: .; // grammar is not sound if we match this
