@@ -7,7 +7,7 @@ public class Value extends Expression {
     public final Atom atom;
 
     public Value(CCLParser.AtomExpressionContext ctx) {
-        super(ctx);
+        super();
         atom = Atom.fromContext(ctx.atom());
     }
 }

@@ -9,7 +9,7 @@ public class Assign extends Statement {
     public final Expression value;
 
     public Assign(CCLParser.AssignmentStatementContext ctx) {
-        super(ctx);
+        super();
         variable = new Identifier(ctx.var);
         value = Expression.fromContext(ctx.expression());
     }

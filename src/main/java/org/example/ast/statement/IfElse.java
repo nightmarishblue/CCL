@@ -10,7 +10,7 @@ public class IfElse extends Statement {
     public final List<Statement> then, else_;
 
     public IfElse(CCLParser.IfStatementContext ctx) {
-        super(ctx);
+        super();
         condition = Condition.fromContext(ctx.condition());
         then = ctx.then.statementList().statement()
                 .stream().map(Statement::fromContext).toList();

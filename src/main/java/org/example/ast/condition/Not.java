@@ -6,7 +6,7 @@ public class Not extends Condition {
     public final Condition inner;
 
     public Not(CCLParser.NegatedConditionContext ctx) {
-        super(ctx);
+        super();
         inner = Condition.fromContext(ctx.condition());
     }
 }

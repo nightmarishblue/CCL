@@ -9,7 +9,7 @@ public class Block extends Statement {
     public final List<Statement> statements;
 
     public Block(CCLParser.NestedBlockStatementContext ctx) {
-        super(ctx);
+        super();
         statements = ctx.statementBlock().statementList().statement()
                 .stream().map(Statement::fromContext).toList();
     }

@@ -10,7 +10,6 @@ public class Call extends Node {
     final List<Identifier> arguments;
 
     public Call(CCLParser.FunctionCallContext ctx) {
-        super(ctx);
         function = new Identifier(ctx.name);
         arguments = ctx.argumentList().names.stream().map(Identifier::new).toList();
     }

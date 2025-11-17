@@ -9,7 +9,7 @@ public class Reference extends Atom {
     public final boolean negate;
 
     public Reference(CCLParser.ReferenceAtomContext ctx) {
-        super(ctx);
+        super();
         variable = new Identifier(ctx.name);
         negate = ctx.unaryOperator() != null; // currently the only unary operator allowed is minus
     }

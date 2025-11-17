@@ -6,7 +6,7 @@ public class Boolean extends Literal {
     public final boolean value;
 
     public Boolean(CCLParser.BooleanLiteralContext ctx) {
-        super(ctx);
+        super();
         final int type = ctx.value.getType();
         value = switch (type) {
             case (CCLParser.KW_TRUE) -> true;

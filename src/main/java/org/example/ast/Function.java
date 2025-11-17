@@ -10,7 +10,6 @@ import org.example.grammar.CCLParser;
 import org.example.helper.Option;
 
 import java.util.List;
-import java.util.Optional;
 
 public class Function extends Node {
     public final Type type;
@@ -24,7 +23,6 @@ public class Function extends Node {
     public final Option<Expression> output;
 
     public Function(CCLParser.FunctionContext ctx) {
-        super(ctx);
         type = Type.fromContext(ctx.type());
         name = new Identifier(ctx.name.getText());
 

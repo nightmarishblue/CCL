@@ -6,7 +6,7 @@ public class Integer extends Literal {
     public final int value;
 
     public Integer(CCLParser.IntegerLiteralContext ctx) {
-        super(ctx);
+        super();
         value = java.lang.Integer.parseInt(ctx.value.getText());
     }
 }

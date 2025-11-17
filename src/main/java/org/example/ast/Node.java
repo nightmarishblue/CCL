@@ -1,16 +1,11 @@
 package org.example.ast;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class Node {
-    public Node(final ParserRuleContext _ctx) {
-    }
-
     @Override
     public String toString() {
         final String type = getClass().getSimpleName();

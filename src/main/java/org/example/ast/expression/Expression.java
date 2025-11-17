@@ -1,12 +1,10 @@
 package org.example.ast.expression;
 
 import org.example.ast.Node;
-import org.example.ast.atom.Atom;
 import org.example.grammar.CCLParser;
 
 public abstract class Expression extends Node {
-    public Expression(CCLParser.ExpressionContext ctx) {
-        super(ctx);
+    public Expression() {
     }
 
     public static <T extends CCLParser.ExpressionContext> Expression fromContext(T ctx) {

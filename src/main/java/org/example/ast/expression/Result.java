@@ -8,7 +8,7 @@ public class Result extends Expression {
     public final Call functionCall;
 
     public Result(CCLParser.FunctionCallExpressionContext ctx) {
-        super(ctx);
+        super();
         functionCall = new Call(ctx.functionCall());
     }
 }

@@ -4,8 +4,7 @@ import org.example.ast.Node;
 import org.example.grammar.CCLParser;
 
 public abstract class Condition extends Node {
-    public Condition(CCLParser.ConditionContext ctx) {
-        super(ctx);
+    public Condition() {
     }
 
     public static <T extends CCLParser.ConditionContext> Condition fromContext(T ctx) {

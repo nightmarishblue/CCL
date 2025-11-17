@@ -11,7 +11,6 @@ public class Main extends Node {
     public final List<Statement> statements;
 
     public Main(CCLParser.MainContext ctx) {
-        super(ctx);
         declarations = ctx.declarationList().declaration().stream().map(Declaration::fromContext).toList();
         statements = ctx.statementList().statement().stream().map(Statement::fromContext).toList();
     }

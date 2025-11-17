@@ -8,7 +8,6 @@ public abstract class Declaration extends Node {
     public final Variable variable;
 
     public Declaration(final CCLParser.DeclarationContext ctx) {
-        super(ctx);
         final CCLParser.VariableContext variableCtx = ctx.getRuleContext(CCLParser.VariableContext.class, 0);
         variable = new Variable(variableCtx);
     }

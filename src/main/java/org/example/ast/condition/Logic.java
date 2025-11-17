@@ -8,7 +8,7 @@ public class Logic extends Condition {
     public final Operator operator;
 
     public Logic(CCLParser.CompoundConditionContext ctx) {
-        super(ctx);
+        super();
         left = Condition.fromContext(ctx.left);
         operator = Operator.fromToken(ctx.logicalOperator().value);
         right = Condition.fromContext(ctx.right);

@@ -8,7 +8,7 @@ public class Arithmetic extends Expression {
     public final Operator operator;
 
     public Arithmetic(CCLParser.ArithmeticExpressionContext ctx) {
-        super(ctx);
+        super();
         left = Expression.fromContext(ctx.left);
         operator = Operator.fromToken(ctx.binaryArithmeticOperator().value);
         right = Expression.fromContext(ctx.right);

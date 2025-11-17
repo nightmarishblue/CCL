@@ -8,7 +8,7 @@ public class Discard extends Statement {
     public final Call functionCall;
 
     public Discard(CCLParser.FunctionCallStatementContext ctx) {
-        super(ctx);
+        super();
         functionCall = new Call(ctx.functionCall());
     }
 }

@@ -9,7 +9,7 @@ public class Compare extends Condition {
     public final Operator operator;
 
     public Compare(CCLParser.ComparisonConditionContext ctx) {
-        super(ctx);
+        super();
         left = Expression.fromContext(ctx.left);
         operator = Operator.fromToken(ctx.comparisonOperator().value);
         right = Expression.fromContext(ctx.right);

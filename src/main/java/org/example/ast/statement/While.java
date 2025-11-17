@@ -10,7 +10,7 @@ public class While extends Statement {
     public final List<Statement> body;
 
     public While(CCLParser.WhileStatementContext ctx) {
-        super(ctx);
+        super();
         condition = Condition.fromContext(ctx.condition());
         body = ctx.statementBlock().statementList().statement()
                 .stream().map(Statement::fromContext).toList();

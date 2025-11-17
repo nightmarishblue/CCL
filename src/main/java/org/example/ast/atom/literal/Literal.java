@@ -4,8 +4,8 @@ import org.example.ast.atom.Atom;
 import org.example.grammar.CCLParser;
 
 public abstract class Literal extends Atom {
-    public Literal(CCLParser.LiteralContext ctx) {
-        super(ctx);
+    public Literal() {
+        super();
     }
 
     public static <T extends CCLParser.LiteralContext> Literal fromContext(T ctx) {
