@@ -23,14 +23,26 @@ public class Main {
             System.out.printf("%s has not parsed\n", file);
     }
 
-    public static boolean parseFile(final String filepath) throws IOException {
-        CharStream stream = CharStreams.fromFileName(filepath);
-        CCLLexer lexer = new CCLLexer(stream);
-        TokenStream tokens = new CommonTokenStream(lexer);
-        CCLParser parser = new CCLParser(tokens);
-        // disable the error reporting to console
+    public static CCLLexer lexer(CharStream chars) {
+        CCLLexer lexer = new CCLLexer(chars);
         lexer.removeErrorListeners();
+        return lexer;
+    }
+
+    public static CCLParser parser(TokenStream tokens) {
+        CCLParser parser = new CCLParser(tokens);
         parser.removeErrorListeners();
+        return parser;
+    }
+
+    public static CCLParser fileParser(final String filepath) throws IOException {
+        CharStream chars = CharStreams.fromFileName(filepath);
+        TokenStream tokens = new CommonTokenStream(lexer(chars));
+        return parser(tokens);
+    }
+
+    public static boolean parseFile(final String filepath) throws IOException {
+        CCLParser parser = fileParser(filepath);
         parser.setErrorHandler(new BailErrorStrategy());
         try {
             parser.program();
