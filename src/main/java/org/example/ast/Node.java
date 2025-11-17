@@ -8,9 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class Node {
-    public final int position; // or something?
-    public Node(final ParserRuleContext ctx) {
-        position = ctx.getStart().getStartIndex();
+    public Node(final ParserRuleContext _ctx) {
     }
 
     @Override
