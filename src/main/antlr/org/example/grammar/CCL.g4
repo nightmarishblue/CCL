@@ -2,7 +2,7 @@ grammar CCL;
 
 options { caseInsensitive = true; } // spec says the language is not case sensitive
 
-program: declarationList functionList main; // (1)
+program: declarationList functionList main EOF; // (1)
 
 declarationList: (declaration SEMICOLON)*; // (2)
 declaration // (3)
@@ -124,6 +124,6 @@ IDENTIFIER: (Letter | '_') (Letter | Digit | '_')*;
 // ignored characters
 WHITESPACE: [ \t\n\r]+ -> skip;
 LINE_COMMENT: '//' .*? '\n' -> skip;
-BLOCK_COMMENT: '/*' (BLOCK_COMMENT | .)*? '*/' -> skip;
+BLOCK_COMMENT: '/*' (BLOCK_COMMENT | .)*? '*/' -> skip; // can't believe I didn't realise lexer rules could be recursive
 
 ILLEGAL: .; // grammar is not sound if we match this
