@@ -1,7 +1,6 @@
 package org.example.lang;
 
 import org.example.ast.data.Identifier;
-import org.example.helper.Iterate;
 import org.example.helper.Option;
 
 import java.util.ArrayDeque;
@@ -11,7 +10,7 @@ import java.util.Map;
 public class SymbolTable<T> {
     // each scope is a map of name-value pairs
     // we use an array deque so we can efficiently iterate it in reverse
-    public final ArrayDeque<HashMap<Identifier, T>> stack = new ArrayDeque<>();
+    private final ArrayDeque<HashMap<Identifier, T>> stack = new ArrayDeque<>();
 
     public void pushScope() {
         stack.push(new HashMap<>());
@@ -30,7 +29,7 @@ public class SymbolTable<T> {
     }
 
     public Option<Map<Identifier, T>> getSymbolScope(final Identifier symbol) {
-        for (Map<Identifier, T> scope : Iterate.on(stack.descendingIterator())) {
+        for (Map<Identifier, T> scope : stack) {
             if (scope.containsKey(symbol)) return Option.some(scope);
         }
         return Option.none();
