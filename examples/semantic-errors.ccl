@@ -3,6 +3,7 @@ const safe:boolean = 5;
 const safe:boolean = true;
 
 void print(i:integer) {
+    var bad:void;
     P = i;
     return();
 }

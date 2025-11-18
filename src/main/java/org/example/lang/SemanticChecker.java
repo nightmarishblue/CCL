@@ -2,6 +2,7 @@ package org.example.lang;
 
 import org.example.ast.AstVisitor;
 import org.example.ast.data.Identifier;
+import org.example.ast.data.Type;
 import org.example.ast.data.Variable;
 import org.example.ast.node.*;
 import org.example.ast.node.atom.Reference;
@@ -74,7 +75,11 @@ public class SemanticChecker extends AstVisitor<Void> {
     // declarations are the only other source of symbols in the table
     @Override
     public Void visitDeclaration(Declaration node) {
-        add(node, node.variable.name());
+        if (node.variable.type() == Type.VOID)
+            error(node, String.format("variable %s cannot be declared with type void", node.variable.name()));
+        else
+            add(node, node.variable.name()); // not adding the variable saves us headache later
+
         return super.visitDeclaration(node);
     }
 
