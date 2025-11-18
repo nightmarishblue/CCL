@@ -1,0 +1,36 @@
+// this file should contain syntax errors
+var P:integer;
+const TEST_CONST:boolean = true;
+
+int multiply(a:integer, :integer) {
+    var output:integer;
+    var i:integer;
+
+    output = 0;
+    i = 0;
+
+    while (i < b {
+        output = output + a;
+        i = i + 1;
+    }
+
+    return (output);
+}
+
+void print(i:integer) {
+    P = i;
+    // pretend we have I/O
+    return ();
+}
+
+main {
+    var i:integer; /* unclosed
+    if b == true | b == false
+    {
+        i = 5;
+        i = double(i);
+    }
+    else {}
+
+    print(i)
+}

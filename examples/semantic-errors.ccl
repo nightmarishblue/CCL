@@ -1,0 +1,22 @@
+var P:integer;
+const safe:boolean = 5;
+const safe:boolean = true;
+
+void print(i:integer) {
+    P = i;
+    return();
+}
+
+main {
+    const magic:integer = undefined_function();
+    var i:integer;
+
+    undeclared_variable = false;
+
+    if safe == true {
+        print(i);
+    }
+    else {
+        print(i, magic);
+    }
+}
