@@ -35,20 +35,31 @@ public class Main {
         return parser;
     }
 
-    public static CCLParser fileParser(final String filepath) throws IOException {
-        CharStream chars = CharStreams.fromFileName(filepath);
-        TokenStream tokens = new CommonTokenStream(lexer(chars));
-        return parser(tokens);
+    public static CCLParser parser(CharStream chars, ANTLRErrorListener listener) {
+        final CCLLexer lexer = lexer(chars);
+        final CCLParser parser = parser(new CommonTokenStream(lexer));
+        lexer.addErrorListener(listener);
+        parser.addErrorListener(listener);
+        return parser;
     }
 
-    public static boolean parseFile(final String filepath) throws IOException {
-        CCLParser parser = fileParser(filepath);
-        parser.setErrorHandler(new BailErrorStrategy());
-        try {
-            parser.program();
-        } catch (ParseCancellationException e) {
-            return false;
-        }
-        return true;
+    // parse a file, outputting either the concrete syntax tree or a list of errors
+    public static CCLParser.ProgramContext parse(CharStream chars) {
+        CollectingErrorListener errorListener = new CollectingErrorListener();
+        final CCLParser parser = parser(chars, errorListener);
+        final CCLParser.ProgramContext program = parser.program();
+
+        List<SourceError> errors = errorListener.getErrors();
+        if (!errors.isEmpty()) throw new CompilationFailed(errors);
+        return program;
+    }
+
+
+    public static void compile(CharStream chars) {
+        // compiling a file consists of
+        // 1. parse the file (stop if errors)
+        CCLParser.ProgramContext p = parse(chars);
+        // 2. construct the ast
+        // 3. semantically analyse
     }
 }
