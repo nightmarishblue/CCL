@@ -2,11 +2,16 @@ package org.example;
 
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.example.antlr.CollectingErrorListener;
+import org.example.antlr.SourceError;
 import org.example.grammar.CCLLexer;
 import org.example.grammar.CCLParser;
+import org.example.antlr.CompilationFailed;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -15,12 +20,20 @@ public class Main {
             System.err.printf("Usage: %s <filename>\n", Main.class.getName());
             System.exit(2);
         }
-        final String file = args[0];
-        final boolean succeeded = parseFile(file);
-        if (succeeded)
-            System.out.printf("%s parsed successfully\n", file);
-        else
-            System.out.printf("%s has not parsed\n", file);
+
+        final Path filepath = Path.of(args[0]);
+        final String contents = Files.readString(filepath);
+        try {
+            compile(CharStreams.fromString(contents));
+        } catch (CompilationFailed failure) {
+            // print the reason(s) for compilation failure
+            final String[] lines = contents.split("\n");
+            failure.errors.forEach(error -> {
+                System.err.println(lines[error.line()]);
+                final String space = " ".repeat(error.position());
+                System.err.printf("%s^ %d:%d %s\n", space, error.line(), error.position(), error.message());
+            });
+        }
     }
 
     public static CCLLexer lexer(CharStream chars) {
