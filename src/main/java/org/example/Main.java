@@ -2,8 +2,11 @@ package org.example;
 
 
 import org.antlr.v4.runtime.*;
+import org.example.antlr.AstBuilder;
 import org.example.antlr.CollectingErrorListener;
 import org.example.antlr.SourceError;
+import org.example.ast.Node;
+import org.example.ast.Program;
 import org.example.grammar.CCLLexer;
 import org.example.grammar.CCLParser;
 import org.example.antlr.CompilationFailed;
@@ -11,6 +14,7 @@ import org.example.antlr.CompilationFailed;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 public class Main {
@@ -71,8 +75,12 @@ public class Main {
     public static void compile(CharStream chars) {
         // compiling a file consists of
         // 1. parse the file (stop if errors)
-        CCLParser.ProgramContext p = parse(chars);
+        final CCLParser.ProgramContext programContext = parse(chars);
         // 2. construct the ast
+        final IdentityHashMap<Node, ParserRuleContext> sourceMap = new IdentityHashMap<>();
+        final Program program = new AstBuilder(sourceMap::put).visitProgram(programContext);
+        System.out.println(program);
+        System.out.println(sourceMap);
         // 3. semantically analyse
     }
 }
