@@ -10,11 +10,12 @@ import org.example.ast.node.Program;
 import org.example.grammar.CCLLexer;
 import org.example.grammar.CCLParser;
 import org.example.antlr.CompilationFailed;
+import org.example.lang.SemanticChecker;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class Main {
             failure.errors.forEach(error -> {
                 System.err.println(lines[error.line()]);
                 final String space = " ".repeat(error.position());
-                System.err.printf("%s^ %d:%d %s\n", space, error.line(), error.position(), error.message());
+                System.err.printf("%s^ %d:%d %s\n", space, error.line() + 1, error.position(), error.message());
             });
         }
     }
@@ -77,12 +78,19 @@ public class Main {
         // compiling a file consists of
         // 1. parse the file (stop if errors)
         final CCLParser.ProgramContext programContext = parse(chars);
+
         // 2. construct the ast
         final IdentityHashMap<Node, ParserRuleContext> sourceMap = new IdentityHashMap<>();
         final Program program = new AstBuilder(sourceMap::put).visitProgram(programContext);
-        System.out.println(program);
-        System.out.println(sourceMap);
-        // 3. semantically analyse
-        System.out.println(Arrays.toString(program.getClass().getFields()));
+
+        // 3. semantically analyse (stop if errors)
+        ArrayList<SourceError> errors = new ArrayList<>();
+        SemanticChecker checker = new SemanticChecker((node, msg) -> {
+            ParserRuleContext context = sourceMap.get(node);
+            Token token = context.getStart();
+            errors.add(new SourceError(token, msg));
+        });
+        checker.visit(program);
+        if (!errors.isEmpty()) throw new CompilationFailed(errors);
     }
 }
