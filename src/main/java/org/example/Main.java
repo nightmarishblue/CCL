@@ -5,8 +5,8 @@ import org.antlr.v4.runtime.*;
 import org.example.antlr.AstBuilder;
 import org.example.antlr.CollectingErrorListener;
 import org.example.antlr.SourceError;
-import org.example.ast.Node;
-import org.example.ast.Program;
+import org.example.ast.node.Node;
+import org.example.ast.node.Program;
 import org.example.grammar.CCLLexer;
 import org.example.grammar.CCLParser;
 import org.example.antlr.CompilationFailed;
@@ -14,6 +14,7 @@ import org.example.antlr.CompilationFailed;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.List;
 
@@ -82,5 +83,6 @@ public class Main {
         System.out.println(program);
         System.out.println(sourceMap);
         // 3. semantically analyse
+        System.out.println(Arrays.toString(program.getClass().getFields()));
     }
 }
