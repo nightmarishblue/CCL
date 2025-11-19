@@ -1,0 +1,26 @@
+const i:integer = 5; // demonstrate shadowing
+const j:integer = 4;
+const twenty:integer = multiply(i, j); // 1. call function before definition
+
+integer multiply(a:integer, b:integer) {
+    var output:integer;
+    var i:integer;
+    var a:integer; // 2. reuse name in same scope
+
+    output = 0;
+    i = 0;
+
+    while (i < b) {
+        output = output + a;
+        i = i + 1;
+    }
+
+    return (output);
+}
+
+main {
+    const magic:integer = undefined_function(); // 3. call undefined function
+    var i:integer;
+
+    undeclared_variable = false; // 4. assign undeclared variable
+}

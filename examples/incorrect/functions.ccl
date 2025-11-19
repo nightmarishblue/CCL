@@ -1,0 +1,39 @@
+var P:integer;
+const magic:integer = 42;
+
+void print(i:integer) {
+    P = i;
+    return();
+}
+
+void shutdown(force:boolean) {
+    return(); // pretend this is a diverging function
+}
+
+integer multiply(a:integer, b:integer) {
+    var output:integer;
+    var i:integer;
+    var a:integer;
+
+    output = 0;
+    i = 0;
+
+    while (i < b) {
+        output = output + a;
+        i = i + 1;
+    }
+
+    return (true); // 1. return an expression of incorrect type TODO
+}
+
+main {
+    var i:integer;
+    const j:integer = multiply + 2; // 2. attempt to read function
+
+    undeclared_variable = false; // 3. assign undeclared variable
+    shutdown = 5; // 4. attempt to write to function
+
+    magic(i); // 5. call a variable
+    i = multiply(magic); // 6. call function with wrong number of arguments
+    shutdown(i); // 7. call function with wrongly-typed arguments
+}

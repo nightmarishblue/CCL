@@ -1,0 +1,37 @@
+var P:integer;
+const safe:boolean = true;
+
+void print(i:integer) {
+    var bad:void; // 1. declare void variable
+    P = i;
+    return();
+}
+
+void shutdown(ignored:void) { // 2. declare void parameter
+    return();
+}
+
+integer multiply(a:integer, b:integer) {
+    var output:integer;
+    var i:integer;
+
+    output = 0;
+
+    while (i < b) { // 3. read unassigned variable
+        output = output + a;
+        i = i + 1;
+    }
+
+    return (output);
+}
+
+main {
+    var i:integer;
+
+    if safe == true {
+        print(i); // 4. call function with unassigned variable
+    }
+    else {
+        P = true; // 5. assign wrong type to variable TODO
+    }
+}

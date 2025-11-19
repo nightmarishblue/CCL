@@ -1,0 +1,26 @@
+const b:boolean = true;
+
+boolean falsy() {
+    return (false);
+}
+
+main {
+    const i:integer = 42 - falsy(); // 1. boolean in arithmetic
+    var j:integer;
+
+    j = -b; // 2. negate a boolean
+
+    if 5 == true { // 3. incorrect types in a comparison // TODO
+    } else {}
+
+    // grammar disallows these constructs
+    // if ((~42) == true) // invert an integer
+    // // shouldn't the grammar disallow this?
+    // {} else {}
+
+    // if (3 || 4) // integers in a logical operation
+    // {} else {}
+
+    if (5 == i) // this should work
+    {} else {}
+}
