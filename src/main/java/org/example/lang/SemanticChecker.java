@@ -61,6 +61,10 @@ public class SemanticChecker extends AstVisitor<Void> {
         error(node, String.format("Identifier %s is undefined", id));
     }
 
+    private void requiredKind(Node node, Identifier id, Class<? extends Data> kind) {
+        error(node, String.format("Identifier %s is not a %s", id, kind.getSimpleName()));
+    }
+
     // create & destroy scopes
     @Override
     public Void visitProgram(Program node) {
@@ -115,7 +119,20 @@ public class SemanticChecker extends AstVisitor<Void> {
 
     @Override
     public Void visitReference(Reference node) {
-        if (!get(node.variable).present()) undefined(node, node.variable);
+        Option<Data> data = get(node.variable);
+        if (!data.present()) {
+            undefined(node, node.variable);
+            return super.visitReference(node);
+        }
+
+        if (!(data.get() instanceof Data.Variable variable)) {
+            requiredKind(node, node.variable, Data.Variable.class);
+            return super.visitReference(node);
+        }
+
+        if (variable instanceof Data.Variable.Mutable mutable && !mutable.assigned())
+            error(node, String.format("Variable %s has not been assigned a value", node.variable));
+
         return super.visitReference(node);
     }
 
@@ -128,7 +145,7 @@ public class SemanticChecker extends AstVisitor<Void> {
         }
 
         if (!(functionSignature.get() instanceof Data.Function function)) {
-            error(node, String.format("Identifier %s is not a function", node.function));
+            requiredKind(node, node.function, Data.Function.class);
             return null;
         }
 
@@ -146,7 +163,7 @@ public class SemanticChecker extends AstVisitor<Void> {
             }
 
             if (!(data.get() instanceof Data.Variable variable)) {
-                error(node, String.format("Argument %s is not a variable", argument));
+                error(node, String.format("Argument %s is not a Variable", argument));
                 continue;
             }
 
@@ -168,19 +185,17 @@ public class SemanticChecker extends AstVisitor<Void> {
             return super.visitAssign(node);
         }
 
-        switch (data.get()) {
-            case Data.Function function -> {
-                error(node, String.format("Cannot assign to function %s", function));
-            }
-            case Data.Variable variable -> {
-                switch (variable) {
-                    case Data.Variable.Constant ignored ->
-                            error(node, String.format("Constant %s cannot be reassigned", node.variable));
-                    case Data.Variable.Mutable mutable -> {
-                        mutable.assign();
-                        // TODO check that the expression is of the correct type for this variable
-                    }
-                }
+        if (!(data.get() instanceof Data.Variable variable)) {
+            requiredKind(node, node.variable, Data.Variable.class);
+            return super.visitAssign(node);
+        }
+
+        switch (variable) {
+            case Data.Variable.Constant ignored ->
+                    error(node, String.format("Constant %s cannot be reassigned", node.variable));
+            case Data.Variable.Mutable mutable -> {
+                mutable.assign();
+                // TODO check that the expression is of the correct type for this variable
             }
         }
         return super.visitAssign(node); // TODO evaluate expression and remove this

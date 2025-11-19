@@ -18,9 +18,8 @@ integer multiply(a:integer, b:integer) {
     var a:integer; // reuse name in same scope
 
     output = 0;
-    i = 0;
 
-    while (i < b) {
+    while (i < b) { // read unassigned variable
         output = output + a;
         i = i + 1;
     }
@@ -31,8 +30,10 @@ integer multiply(a:integer, b:integer) {
 main {
     const magic:integer = undefined_function(); // call undefined function
     var i:integer;
+    const j:integer = multiply + 2; // attempt to read function
 
     undeclared_variable = false; // assign undeclared variable
+    shutdown = 5; // attempt to write to function
 
     if safe == true {
         print(i); // call function with unassigned variable
