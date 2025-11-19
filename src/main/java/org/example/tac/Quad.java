@@ -12,6 +12,15 @@ public record Quad(Op op, Address arg1, Option<Address> arg2, Option<Address> re
         return new Quad(op, arg1, Option.some(arg2), Option.some(result));
     }
 
+    public static Quad label(Address.Name name) {
+        return new Quad(Op.LABEL, name, Option.none(), Option.none());
+    }
+
+    // goto is a reserved Java keyword. who knew?
+    public static Quad jump(Address.Name name) {
+        return new Quad(Op.GOTO, name, Option.none(), Option.none());
+    }
+
     public String instruction() {
         return switch (op) {
             // special cases for jump, etc. can go here

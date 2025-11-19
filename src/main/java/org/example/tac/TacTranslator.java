@@ -13,6 +13,7 @@ import org.example.ast.node.declaration.Var;
 import org.example.ast.node.expression.Arithmetic;
 import org.example.ast.node.statement.Assign;
 import org.example.ast.node.statement.IfElse;
+import org.example.ast.node.statement.While;
 import org.example.helper.Option;
 
 public class TacTranslator extends AstVisitor<Option<Address>> {
@@ -101,7 +102,7 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
             case Compare cmp -> {
                 Address left = visit(cmp.left).get(), right = visit(cmp.right).get();
                 emit(Quad.binary(Op.comparison(cmp.operator), left, right, trueLabel));
-                emit(new Quad(Op.GOTO, falseLabel, Option.none(), Option.none()));
+                emit(Quad.label(falseLabel));
             }
             // logical operators can be recreated with multiple ifs
             case Logic logic -> {
@@ -125,7 +126,7 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
                      */
                     emitCondition(logic.left, trueLabel, middle);
                 }
-                emit(new Quad(Op.LABEL, middle, Option.none(), Option.none()));
+                emit(Quad.label(middle));
                 emitCondition(logic.right, trueLabel, falseLabel);
             }
             // a not is easy - just swap the labels
@@ -140,13 +141,13 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
         Address.Name then = label(), else_ = label(), endif = label();
         emitCondition(node.condition, then, else_); // this needs both labels, so we can't get away with using 2 total
 
-        emit(new Quad(Op.LABEL, then, Option.none(), Option.none()));
+        emit(Quad.label(then));
         node.then.forEach(this::visit);
-        emit(new Quad(Op.GOTO, endif, Option.none(), Option.none()));
+        emit(Quad.jump(endif));
 
-        emit(new Quad(Op.LABEL, else_, Option.none(), Option.none()));
+        emit(Quad.label(else_));
         node.else_.forEach(this::visit);
-        emit(new Quad(Op.LABEL, endif, Option.none(), Option.none()));
+        emit(Quad.label(endif));
 
         return Option.none();
     }
