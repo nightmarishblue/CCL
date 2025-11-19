@@ -5,10 +5,13 @@ import org.example.ast.node.atom.Reference;
 import org.example.ast.node.atom.literal.Literal;
 import org.example.ast.node.declaration.Const;
 import org.example.ast.node.declaration.Declaration;
+import org.example.ast.node.declaration.Var;
 import org.example.ast.node.expression.Arithmetic;
+import org.example.ast.node.statement.Assign;
 import org.example.helper.Option;
 
 public class TacTranslator extends AstVisitor<Option<Address>> {
+    // visit(Expression) should return an address, anything else should return none
     private int temps = 0;
 
     private Address temp() {
@@ -22,12 +25,6 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
     @Override
     protected Option<Address> defaultValue() {
         return Option.none();
-    }
-
-    @Override
-    public Option<Address> visitDeclaration(Declaration node) {
-//        System.out.
-        return super.visitDeclaration(node);
     }
 
     @Override
@@ -67,8 +64,21 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
     public Option<Address> visitConst(Const node) {
         Address value = visit(node.value).get();
         Address result = new Address.Name(node.variable.name().value());
-
         emit(Quad.unary(Op.COPY, value, result));
-        return Option.some(result);
+        return Option.none();
+    }
+
+    @Override
+    public Option<Address> visitVar(Var node) {
+        // we're leaving this as a no-op since we mandate assignment before reading
+        return super.visitVar(node);
+    }
+
+    @Override
+    public Option<Address> visitAssign(Assign node) {
+        Address value = visit(node.value).get();
+        Address result = new Address.Name(node.variable.value());
+        emit(Quad.unary(Op.COPY, value, result));
+        return Option.none();
     }
 }
