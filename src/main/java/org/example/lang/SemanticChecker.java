@@ -9,6 +9,7 @@ import org.example.ast.node.atom.Reference;
 import org.example.ast.node.atom.literal.Boolean;
 import org.example.ast.node.atom.literal.Integer;
 import org.example.ast.node.condition.Compare;
+import org.example.ast.node.condition.Logic;
 import org.example.ast.node.declaration.Const;
 import org.example.ast.node.declaration.Var;
 import org.example.ast.node.expression.Arithmetic;
@@ -188,6 +189,12 @@ public class SemanticChecker extends AstVisitor<Type> {
         if (visit(node.right) != Type.INTEGER)
             error(node, "Right-hand side of arithmetic expression must be of type INTEGER");
         return Type.INTEGER;
+    }
+
+    @Override
+    public Type visitLogic(Logic node) {
+        // grammar doesn't allow you to use expressions like a || b, so there's no need to check
+        return Type.BOOLEAN;
     }
 
     @Override
