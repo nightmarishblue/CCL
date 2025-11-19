@@ -19,5 +19,8 @@ main {
     }
     else {
         print(i, magic);
+        magic = 43;
     }
+
+    print(safe);
 }
