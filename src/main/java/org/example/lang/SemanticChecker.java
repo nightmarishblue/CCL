@@ -7,7 +7,7 @@ import org.example.ast.data.Variable;
 import org.example.ast.node.*;
 import org.example.ast.node.atom.Reference;
 import org.example.ast.node.declaration.Const;
-import org.example.ast.node.declaration.Declaration;
+import org.example.ast.node.declaration.Var;
 import org.example.ast.node.statement.Assign;
 import org.example.helper.Option;
 import org.example.helper.Pair;
@@ -52,6 +52,7 @@ public class SemanticChecker extends AstVisitor<Void> {
         return environment.getSymbol(id);
     }
 
+    // helpers to add error messages
     private void alreadyDefined(Node node, Identifier id) {
         error(node, String.format("Identifier %s is already defined in this scope", id));
     }
@@ -80,13 +81,11 @@ public class SemanticChecker extends AstVisitor<Void> {
             alreadyDefined(function, function.name);
         push();
         // ...and add their parameters to their own scope
-        for (Variable var : function.parameters) {
-            if (var.type() == Type.VOID)
-                error(function, String.format("Function parameter %s cannot be declared with type VOID", var.name()));
-            else {
-                if (!add(var.name(), new Data.Variable(var.type(), false)))
-                    alreadyDefined(function, var.name());
-            }
+        for (Variable parameter : function.parameters) {
+            if (parameter.type() == Type.VOID)
+                error(function, String.format("Function parameter %s cannot be declared with type VOID", parameter.name()));
+            if (!add(parameter.name(), new Data.Variable.Mutable(parameter.type()).assign()))
+                alreadyDefined(function, parameter.name());
         }
         visitChildren(function);
         pop();
@@ -95,15 +94,22 @@ public class SemanticChecker extends AstVisitor<Void> {
 
     // declarations are the only other source of symbols in the table
     @Override
-    public Void visitDeclaration(Declaration node) {
-        // not adding the variable in the case of void saves us headache later
+    public Void visitConst(Const node) {
         final Variable var = node.variable;
         if (var.type() == Type.VOID)
-            error(node, String.format("Variable %s cannot be declared with type void", var.name()));
-        else {
-            if (!add(var.name(), new Data.Variable(var.type(), node instanceof Const)))
-                alreadyDefined(node, var.name());
-        }
+            error(node, String.format("Constant %s cannot be declared with type VOID", var.name()));
+        if (!add(var.name(), new Data.Variable.Constant(var.type())))
+            alreadyDefined(node, var.name());
+        return super.visitConst(node); // TODO evaluate expression and remove this
+    }
+
+    @Override
+    public Void visitVar(Var node) {
+        final Variable var = node.variable;
+        if (var.type() == Type.VOID)
+            error(node, String.format("Variable %s cannot be declared with type VOID", var.name()));
+        if (!add(var.name(), new Data.Variable.Mutable(var.type())))
+            alreadyDefined(node, var.name());
         return null;
     }
 
@@ -121,39 +127,92 @@ public class SemanticChecker extends AstVisitor<Void> {
             return null;
         }
 
-        if (functionSignature.get() instanceof Data.Function function) {
-            if (function.parameterTypes().size() != node.arguments.size())
-                error(node, String.format("Function %s called with the wrong number of arguments", node.function));
+        if (!(functionSignature.get() instanceof Data.Function function)) {
+            error(node, String.format("Identifier %s is not a function", node.function));
+            return null;
+        }
 
-            for (Pair<Type, Identifier> pair : Util.zip(function.parameterTypes(), node.arguments)) {
-                final Type required = pair.left();
-                final Identifier argument = pair.right();
-                final Option<Data> signature = get(argument);
-                if (!signature.present()) error(node, String.format("Argument %s is undefined", argument));
-                else if (signature.get() instanceof Data.Variable variable && variable.type() != required)
-                    error(node, String.format("Argument %s is of type %s, required type is %s", argument, variable.type(), required));
-                else error(node, String.format("Argument %s is not a variable", argument));
+        if (function.parameterTypes().size() != node.arguments.size())
+            error(node, String.format("Function %s called with the wrong number of arguments", node.function));
+
+        for (Pair<Type, Identifier> pair : Util.zip(function.parameterTypes(), node.arguments)) {
+            final Type requiredType = pair.left();
+            final Identifier argument = pair.right();
+
+            final Option<Data> data = get(argument);
+            if (!data.present()) {
+                error(node, String.format("Argument %s is undefined", argument));
+                continue;
             }
-        } else error(node, String.format("Identifier %s is not a function", node.function));
+
+            if (!(data.get() instanceof Data.Variable variable)) {
+                error(node, String.format("Argument %s is not a variable", argument));
+                continue;
+            }
+
+            if (variable.type() != requiredType)
+                error(node, String.format("Argument %s is of type %s, required type is %s",
+                        argument, variable.type(), requiredType));
+
+            if (variable instanceof Data.Variable.Mutable mutable && !mutable.assigned())
+                error(node, String.format("Argument %s has not been assigned a value", argument));
+        }
         return null;
     }
 
     @Override
     public Void visitAssign(Assign node) {
-        Option<Data> signature = get(node.variable);
-        if (signature.present()) {
-            if (signature.get() instanceof Data.Variable variable) {
-                if (variable.constant()) error(node, String.format("%s is constant and cannot be reassigned", node.variable));
-                // TODO check that the expression is of the correct type
+        Option<Data> data = get(node.variable);
+        if (!data.present()) {
+            undefined(node, node.variable);
+            return super.visitAssign(node);
+        }
+
+        switch (data.get()) {
+            case Data.Function function -> {
+                error(node, String.format("Cannot assign to function %s", function));
             }
-        } else undefined(node, node.variable);
-        return null;
+            case Data.Variable variable -> {
+                switch (variable) {
+                    case Data.Variable.Constant ignored ->
+                            error(node, String.format("Constant %s cannot be reassigned", node.variable));
+                    case Data.Variable.Mutable mutable -> {
+                        mutable.assign();
+                        // TODO check that the expression is of the correct type for this variable
+                    }
+                }
+            }
+        }
+        return super.visitAssign(node); // TODO evaluate expression and remove this
     }
 
     public sealed interface Data {
-        record Variable(Type type, boolean constant) implements Data {
-            public Variable {
-                if (type == Type.VOID) throw new IllegalArgumentException("Variables may not be type void");
+        Type type();
+
+        sealed interface Variable extends Data {
+            record Constant(Type type) implements Variable {}
+
+            final class Mutable implements Variable {
+                private final Type type;
+                private boolean assigned = false;
+
+                public Mutable(Type type) {
+                    this.type = type;
+                }
+
+                public boolean assigned() {
+                    return assigned;
+                }
+
+                public Type type() {
+                    return type;
+                }
+
+                // mark this mutable variable as assigned (return self for chaining)
+                public Mutable assign() {
+                    assigned = true;
+                    return this;
+                }
             }
         }
 

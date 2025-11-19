@@ -1,26 +1,47 @@
+// this file contains various semantic errors
 var P:integer;
-const safe:boolean = 5;
 const safe:boolean = true;
 
 void print(i:integer) {
-    var bad:void;
+    var bad:void; // declare void variable
     P = i;
     return();
 }
 
+void shutdown(ignored:void) { // declare void parameter
+    return();
+}
+
+integer multiply(a:integer, b:integer) {
+    var output:integer;
+    var i:integer;
+    var a:integer; // reuse name in same scope
+
+    output = 0;
+    i = 0;
+
+    while (i < b) {
+        output = output + a;
+        i = i + 1;
+    }
+
+    return (output);
+}
+
 main {
-    const magic:integer = undefined_function();
+    const magic:integer = undefined_function(); // call undefined function
     var i:integer;
 
-    undeclared_variable = false;
+    undeclared_variable = false; // assign undeclared variable
 
     if safe == true {
-        print(i);
+        print(i); // call function with unassigned variable
     }
     else {
-        print(i, magic);
-        magic = 43;
+        P = true; // assign wrong type to variable TODO
+        i = multiply(magic); // call function with wrong number of arguments
+        shutdown(i); // call function with wrongly-typed arguments
     }
 
-    print(safe);
+    magic(i); // call a variable
 }
