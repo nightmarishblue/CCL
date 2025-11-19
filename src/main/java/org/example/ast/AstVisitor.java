@@ -42,7 +42,7 @@ public abstract class AstVisitor<T> {
             final T output = (T) method.invoke(this, node); // visit*() methods all return T
             return output;
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getCause());
         }
     }
 
