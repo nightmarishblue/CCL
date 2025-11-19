@@ -7,13 +7,14 @@ void print(i:integer) {
 }
 
 void shutdown(force:boolean) {
-    return(); // pretend this is a diverging function
+    const error_code:integer = 1;
+    // pretend this is a diverging function
+    return(error_code); // 1. return expression of incorrect type
 }
 
-integer multiply(a:integer, b:integer) {
+integer multiply(a:integer, b:integer) { // 2. return no expression in non-void function
     var output:integer;
     var i:integer;
-    var a:integer;
 
     output = 0;
     i = 0;
@@ -23,14 +24,13 @@ integer multiply(a:integer, b:integer) {
         i = i + 1;
     }
 
-    return (true); // 1. return an expression of incorrect type TODO
+    return (); // nothing is stored in the AST if return is empty, so see comment above
 }
 
 main {
     var i:integer;
-    const j:integer = multiply + 2; // 2. attempt to read function
+    const j:integer = multiply + 2; // 3. attempt to read function
 
-    undeclared_variable = false; // 3. assign undeclared variable
     shutdown = 5; // 4. attempt to write to function
 
     magic(i); // 5. call a variable

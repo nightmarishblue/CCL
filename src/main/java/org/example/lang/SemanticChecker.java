@@ -91,6 +91,7 @@ public class SemanticChecker extends AstVisitor<Type> {
         // functions add their name to the parent scope...
         if (!add(function.name, Data.Function.of(function)))
             alreadyDefined(function, function.name);
+
         push();
         // ...and add their parameters to their own scope
         for (Variable parameter : function.parameters) {
@@ -99,7 +100,16 @@ public class SemanticChecker extends AstVisitor<Type> {
             if (!add(parameter.name(), new Data.Variable.Mutable(parameter.type()).assign()))
                 alreadyDefined(function, parameter.name());
         }
-        visitChildren(function);
+
+        function.declarations.forEach(this::visit);
+        function.statements.forEach(this::visit);
+
+        Type receivedType = function.output.mapOr(Type.VOID, this::visit);
+        if (receivedType != function.type) {
+            error(function.output.mapOr(function, Node.class::cast),
+                    String.format("Function %s must return %s, received %s", function.name, function.type, receivedType));
+        }
+
         pop();
         return Type.VOID;
     }
@@ -216,7 +226,8 @@ public class SemanticChecker extends AstVisitor<Type> {
         }
 
         if (parameterTypes.size() != node.arguments.size())
-            error(node, String.format("Function %s called with the wrong number of arguments", node.function));
+            error(node, String.format("Function %s called with %d argument(s), requires %d",
+                    node.function, node.arguments.size(), parameterTypes.size()));
 
         for (Pair<Type, Identifier> pair : Util.zip(parameterTypes, node.arguments)) {
             final Type requiredType = pair.left();
