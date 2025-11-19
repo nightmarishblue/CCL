@@ -6,4 +6,6 @@ public abstract class Literal extends Atom {
     public Literal() {
         super();
     }
+
+    public abstract Object value();
 }

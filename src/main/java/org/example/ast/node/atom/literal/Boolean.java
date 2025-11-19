@@ -6,4 +6,9 @@ public class Boolean extends Literal {
     public Boolean(boolean value) {
         this.value = value;
     }
+
+    @Override
+    public Object value() {
+        return value;
+    }
 }

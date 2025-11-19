@@ -6,4 +6,9 @@ public class Integer extends Literal {
     public Integer(int value) {
         this.value = value;
     }
+
+    @Override
+    public Object value() {
+        return value;
+    }
 }
