@@ -1,6 +1,7 @@
 package org.example.tac;
 
 import org.example.ast.AstVisitor;
+import org.example.ast.node.atom.Reference;
 import org.example.ast.node.atom.literal.Literal;
 import org.example.ast.node.declaration.Const;
 import org.example.ast.node.declaration.Declaration;
@@ -33,6 +34,20 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
     public Option<Address> visitLiteral(Literal node) {
         Address out = new Address.Constant(node.value());
         return Option.some(out);
+    }
+
+    @Override
+    public Option<Address> visitReference(Reference node) {
+        Address.Name name = new Address.Name(node.variable.value());
+        if (node.negate) {
+            Address temp = temp();
+            // our 3AC as no unary negation support, so we create a temporary
+            Quad negation = Quad.binary(Op.MINUS, new Address.Constant(0), name, temp);
+            emit(negation);
+            return Option.some(temp);
+        } else {
+            return Option.some(name);
+        }
     }
 
     @Override
