@@ -27,11 +27,12 @@ integer multiply(a:integer, b:integer) {
 
 main {
     var i:integer;
+    const j:integer = safe; // 4. declare const with value of wrong type
 
     if safe == true {
-        print(i); // 4. call function with unassigned variable
+        print(i); // 5. call function with unassigned variable
     }
     else {
-        P = true; // 5. assign wrong type to variable TODO
+        P = true; // 6. assign wrong type to variable
     }
 }

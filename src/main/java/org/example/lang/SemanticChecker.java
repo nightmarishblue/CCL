@@ -112,7 +112,14 @@ public class SemanticChecker extends AstVisitor<Type> {
             error(node, String.format("Constant %s cannot be declared with type VOID", var.name()));
         if (!add(var.name(), new Data.Variable.Constant(var.type())))
             alreadyDefined(node, var.name());
-        return super.visitConst(node); // TODO evaluate expression and remove this
+        // don't type check the value if already void
+        if (var.type() != Type.VOID) {
+            Type valueType = visit(node.value);
+            if (valueType != var.type())
+                error(node, String.format("Constant %s requires a value of type %s, received %s",
+                        node.variable.name(), var.type(), valueType));
+        }
+        return Type.VOID;
     }
 
     @Override
@@ -143,10 +150,13 @@ public class SemanticChecker extends AstVisitor<Type> {
                     error(node, String.format("Constant %s cannot be reassigned", node.variable));
             case Data.Variable.Mutable mutable -> {
                 mutable.assign();
-                // TODO check that the expression is of the correct type for this variable
+                Type valueType = visit(node.value);
+                if (valueType != mutable.type)
+                    error(node, String.format("Variable %s requires a value of type %s, received %s",
+                            node.variable, mutable.type, valueType));
             }
         }
-        return super.visitAssign(node); // TODO evaluate expression and remove this
+        return Type.VOID;
     }
 
     // typed nodes
