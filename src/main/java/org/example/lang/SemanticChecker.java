@@ -6,6 +6,8 @@ import org.example.ast.data.Type;
 import org.example.ast.data.Variable;
 import org.example.ast.node.*;
 import org.example.ast.node.atom.Reference;
+import org.example.ast.node.atom.literal.Boolean;
+import org.example.ast.node.atom.literal.Integer;
 import org.example.ast.node.declaration.Const;
 import org.example.ast.node.declaration.Var;
 import org.example.ast.node.statement.Assign;
@@ -16,12 +18,17 @@ import org.example.helper.Util;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class SemanticChecker extends AstVisitor<Void> {
+public class SemanticChecker extends AstVisitor<Type> {
     private final SymbolTable<Data> environment = new SymbolTable<>();
     public final BiConsumer<Node, String> onError;
 
     public SemanticChecker(BiConsumer<Node, String> onError) {
         this.onError = onError;
+    }
+
+    @Override
+    protected Type defaultValue() {
+        return Type.VOID; // void is our "empty" type
     }
 
     private void error(Node node, String message) {
@@ -67,19 +74,19 @@ public class SemanticChecker extends AstVisitor<Void> {
 
     // create & destroy scopes
     @Override
-    public Void visitProgram(Program node) {
+    public Type visitProgram(Program node) {
         wrapScope(node);
-        return null;
+        return Type.VOID;
     }
 
     @Override
-    public Void visitMain(Main node) {
+    public Type visitMain(Main node) {
         wrapScope(node);
-        return null;
+        return Type.VOID;
     }
 
     @Override
-    public Void visitFunction(Function function) {
+    public Type visitFunction(Function function) {
         // functions add their name to the parent scope...
         if (!add(function.name, Data.Function.of(function)))
             alreadyDefined(function, function.name);
@@ -93,12 +100,12 @@ public class SemanticChecker extends AstVisitor<Void> {
         }
         visitChildren(function);
         pop();
-        return null;
+        return Type.VOID;
     }
 
     // declarations are the only other source of symbols in the table
     @Override
-    public Void visitConst(Const node) {
+    public Type visitConst(Const node) {
         final Variable var = node.variable;
         if (var.type() == Type.VOID)
             error(node, String.format("Constant %s cannot be declared with type VOID", var.name()));
@@ -108,17 +115,52 @@ public class SemanticChecker extends AstVisitor<Void> {
     }
 
     @Override
-    public Void visitVar(Var node) {
+    public Type visitVar(Var node) {
         final Variable var = node.variable;
         if (var.type() == Type.VOID)
             error(node, String.format("Variable %s cannot be declared with type VOID", var.name()));
         if (!add(var.name(), new Data.Variable.Mutable(var.type())))
             alreadyDefined(node, var.name());
-        return null;
+        return Type.VOID;
     }
 
     @Override
-    public Void visitReference(Reference node) {
+    public Type visitAssign(Assign node) {
+        Option<Data> data = get(node.variable);
+        if (!data.present()) {
+            undefined(node, node.variable);
+            return super.visitAssign(node);
+        }
+
+        if (!(data.get() instanceof Data.Variable variable)) {
+            requiredKind(node, node.variable, Data.Variable.class);
+            return super.visitAssign(node);
+        }
+
+        switch (variable) {
+            case Data.Variable.Constant ignored ->
+                    error(node, String.format("Constant %s cannot be reassigned", node.variable));
+            case Data.Variable.Mutable mutable -> {
+                mutable.assign();
+                // TODO check that the expression is of the correct type for this variable
+            }
+        }
+        return super.visitAssign(node); // TODO evaluate expression and remove this
+    }
+
+    // typed nodes
+    @Override
+    public Type visitInteger(Integer node) {
+        return Type.INTEGER;
+    }
+
+    @Override
+    public Type visitBoolean(Boolean node) {
+        return Type.BOOLEAN;
+    }
+
+    @Override
+    public Type visitReference(Reference node) {
         Option<Data> data = get(node.variable);
         if (!data.present()) {
             undefined(node, node.variable);
@@ -133,20 +175,20 @@ public class SemanticChecker extends AstVisitor<Void> {
         if (variable instanceof Data.Variable.Mutable mutable && !mutable.assigned())
             error(node, String.format("Variable %s has not been assigned a value", node.variable));
 
-        return super.visitReference(node);
+        return variable.type();
     }
 
     @Override
-    public Void visitCall(Call node) {
+    public Type visitCall(Call node) {
         final Option<Data> functionSignature = get(node.function);
         if (!functionSignature.present()) {
             undefined(node, node.function);
-            return null;
+            return Type.VOID;
         }
 
         if (!(functionSignature.get() instanceof Data.Function function)) {
             requiredKind(node, node.function, Data.Function.class);
-            return null;
+            return Type.VOID;
         }
 
         if (function.parameterTypes().size() != node.arguments.size())
@@ -174,32 +216,11 @@ public class SemanticChecker extends AstVisitor<Void> {
             if (variable instanceof Data.Variable.Mutable mutable && !mutable.assigned())
                 error(node, String.format("Argument %s has not been assigned a value", argument));
         }
-        return null;
+
+        return function.type;
     }
 
-    @Override
-    public Void visitAssign(Assign node) {
-        Option<Data> data = get(node.variable);
-        if (!data.present()) {
-            undefined(node, node.variable);
-            return super.visitAssign(node);
-        }
 
-        if (!(data.get() instanceof Data.Variable variable)) {
-            requiredKind(node, node.variable, Data.Variable.class);
-            return super.visitAssign(node);
-        }
-
-        switch (variable) {
-            case Data.Variable.Constant ignored ->
-                    error(node, String.format("Constant %s cannot be reassigned", node.variable));
-            case Data.Variable.Mutable mutable -> {
-                mutable.assign();
-                // TODO check that the expression is of the correct type for this variable
-            }
-        }
-        return super.visitAssign(node); // TODO evaluate expression and remove this
-    }
 
     public sealed interface Data {
         Type type();
