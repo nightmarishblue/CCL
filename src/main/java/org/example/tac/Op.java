@@ -5,6 +5,8 @@ import org.example.ast.node.expression.Arithmetic;
 
 // represents all possible operators in our 3AC dialect
 public enum Op {
+    COPY,
+
     PLUS, MINUS, TIMES, DIVIDE, // binary arithmetic
     AND, OR, // binary logical
     NOT; // unary logical
@@ -20,6 +22,7 @@ public enum Op {
             case OR -> "||";
 
             case NOT -> "~";
+            default -> "";
         };
     }
 
