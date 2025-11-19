@@ -102,7 +102,7 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
             case Compare cmp -> {
                 Address left = visit(cmp.left).get(), right = visit(cmp.right).get();
                 emit(Quad.binary(Op.comparison(cmp.operator), left, right, trueLabel));
-                emit(Quad.label(falseLabel));
+                emit(Quad.jump(falseLabel));
             }
             // logical operators can be recreated with multiple ifs
             case Logic logic -> {
@@ -148,6 +148,22 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
         emit(Quad.label(else_));
         node.else_.forEach(this::visit);
         emit(Quad.label(endif));
+
+        return Option.none();
+    }
+
+    @Override
+    public Option<Address> visitWhile(While node) {
+        Address.Name check = label(), body = label(), end = label();
+
+        emit(Quad.label(check));
+        emitCondition(node.condition, body, end); // if true go to body, else go to end
+
+        emit(Quad.label(body));
+        node.body.forEach(this::visit);
+
+        emit(Quad.jump(check));
+        emit(Quad.label(end));
 
         return Option.none();
     }
