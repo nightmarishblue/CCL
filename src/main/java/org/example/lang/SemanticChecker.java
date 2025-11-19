@@ -186,15 +186,15 @@ public class SemanticChecker extends AstVisitor<Type> {
             return Type.VOID;
         }
 
-        if (!(functionSignature.get() instanceof Data.Function function)) {
+        if (!(functionSignature.get() instanceof Data.Function(Type returnType, List<Type> parameterTypes))) {
             requiredKind(node, node.function, Data.Function.class);
             return Type.VOID;
         }
 
-        if (function.parameterTypes().size() != node.arguments.size())
+        if (parameterTypes.size() != node.arguments.size())
             error(node, String.format("Function %s called with the wrong number of arguments", node.function));
 
-        for (Pair<Type, Identifier> pair : Util.zip(function.parameterTypes(), node.arguments)) {
+        for (Pair<Type, Identifier> pair : Util.zip(parameterTypes, node.arguments)) {
             final Type requiredType = pair.left();
             final Identifier argument = pair.right();
 
@@ -217,7 +217,7 @@ public class SemanticChecker extends AstVisitor<Type> {
                 error(node, String.format("Argument %s has not been assigned a value", argument));
         }
 
-        return function.type;
+        return returnType;
     }
 
 
@@ -252,9 +252,13 @@ public class SemanticChecker extends AstVisitor<Type> {
             }
         }
 
-        record Function(Type type, List<Type> parameterTypes) implements Data {
+        record Function(Type returnType, List<Type> parameterTypes) implements Data {
             public static Function of(org.example.ast.node.Function function) {
                 return new Function(function.type, function.parameters.stream().map(org.example.ast.data.Variable::type).toList());
+            }
+
+            public Type type() {
+                return returnType;
             }
         }
     }
