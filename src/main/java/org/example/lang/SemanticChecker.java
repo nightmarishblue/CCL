@@ -10,6 +10,7 @@ import org.example.ast.node.atom.literal.Boolean;
 import org.example.ast.node.atom.literal.Integer;
 import org.example.ast.node.declaration.Const;
 import org.example.ast.node.declaration.Var;
+import org.example.ast.node.expression.Arithmetic;
 import org.example.ast.node.statement.Assign;
 import org.example.helper.Option;
 import org.example.helper.Pair;
@@ -160,6 +161,16 @@ public class SemanticChecker extends AstVisitor<Type> {
     }
 
     @Override
+    public Type visitArithmetic(Arithmetic node) {
+        if (visit(node.left) != Type.INTEGER)
+            error(node, "Left-hand side of arithmetic expression must be of type INTEGER");
+        if (visit(node.right) != Type.INTEGER)
+            error(node, "Right-hand side of arithmetic expression must be of type INTEGER");
+        return Type.INTEGER;
+    }
+
+    // the following nodes' types are dependent on
+    @Override
     public Type visitReference(Reference node) {
         Option<Data> data = get(node.variable);
         if (!data.present()) {
@@ -175,6 +186,9 @@ public class SemanticChecker extends AstVisitor<Type> {
         if (variable instanceof Data.Variable.Mutable mutable && !mutable.assigned())
             error(node, String.format("Variable %s has not been assigned a value", node.variable));
 
+        if (node.negate && variable.type() != Type.INTEGER)
+            error(node, String.format("Variable %s is not an INTEGER and can't be negated", node.variable));
+
         return variable.type();
     }
 
@@ -183,12 +197,12 @@ public class SemanticChecker extends AstVisitor<Type> {
         final Option<Data> functionSignature = get(node.function);
         if (!functionSignature.present()) {
             undefined(node, node.function);
-            return Type.VOID;
+            return super.visitCall(node);
         }
 
         if (!(functionSignature.get() instanceof Data.Function(Type returnType, List<Type> parameterTypes))) {
             requiredKind(node, node.function, Data.Function.class);
-            return Type.VOID;
+            return super.visitCall(node);
         }
 
         if (parameterTypes.size() != node.arguments.size())
@@ -219,8 +233,6 @@ public class SemanticChecker extends AstVisitor<Type> {
 
         return returnType;
     }
-
-
 
     public sealed interface Data {
         Type type();
