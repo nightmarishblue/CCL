@@ -3,19 +3,29 @@ package org.example.tac;
 import org.example.ast.AstVisitor;
 import org.example.ast.node.atom.Reference;
 import org.example.ast.node.atom.literal.Literal;
+import org.example.ast.node.condition.Compare;
+import org.example.ast.node.condition.Condition;
+import org.example.ast.node.condition.Logic;
+import org.example.ast.node.condition.Not;
 import org.example.ast.node.declaration.Const;
 import org.example.ast.node.declaration.Declaration;
 import org.example.ast.node.declaration.Var;
 import org.example.ast.node.expression.Arithmetic;
 import org.example.ast.node.statement.Assign;
+import org.example.ast.node.statement.IfElse;
 import org.example.helper.Option;
 
 public class TacTranslator extends AstVisitor<Option<Address>> {
-    // visit(Expression) should return an address, anything else should return none
+    // visit(Expression) should return an address, as should Condition
     private int temps = 0;
+    private int labels = 0;
 
     private Address temp() {
         return new Address.Name("t" + ++temps);
+    }
+
+    private Address.Name label() {
+        return new Address.Name("l" + ++labels);
     }
 
     private void emit(Quad quad) {
@@ -79,6 +89,65 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
         Address value = visit(node.value).get();
         Address result = new Address.Name(node.variable.value());
         emit(Quad.unary(Op.COPY, value, result));
+        return Option.none();
+    }
+
+    // logical operators are allowed in assignments but not conditional jumps
+    // comparison operators are mandated in conditional jumps but disallowed in assignments
+    // terrible 3ac design and terrible grammar design have both come together magically to force this on me
+    void emitCondition(Condition condition, Address.Name trueLabel, Address.Name falseLabel) {
+        switch (condition) {
+            // comparison operators work as-is
+            case Compare cmp -> {
+                Address left = visit(cmp.left).get(), right = visit(cmp.right).get();
+                emit(Quad.binary(Op.comparison(cmp.operator), left, right, trueLabel));
+                emit(new Quad(Op.GOTO, falseLabel, Option.none(), Option.none()));
+            }
+            // logical operators can be recreated with multiple ifs
+            case Logic logic -> {
+                Address.Name middle = label();
+                if (logic.operator == Logic.Operator.AND) {
+                    /*
+                        A && B is equivalent to:
+                        if a goto middle
+                        goto false
+                        middle:
+                        if b goto true
+                        goto false
+                     */
+                    emitCondition(logic.left, middle, falseLabel);
+                } else {
+                    /*
+                        A || B is equivalent to:
+                        if a goto true
+                        if b goto true
+                        goto false
+                     */
+                    emitCondition(logic.left, trueLabel, middle);
+                }
+                emit(new Quad(Op.LABEL, middle, Option.none(), Option.none()));
+                emitCondition(logic.right, trueLabel, falseLabel);
+            }
+            // a not is easy - just swap the labels
+            case Not not -> emitCondition(not.inner, falseLabel, trueLabel);
+            default -> throw new IllegalStateException("Unexpected value: " + condition);
+        }
+    }
+
+
+    @Override
+    public Option<Address> visitIfElse(IfElse node) {
+        Address.Name then = label(), else_ = label(), endif = label();
+        emitCondition(node.condition, then, else_); // this needs both labels, so we can't get away with using 2 total
+
+        emit(new Quad(Op.LABEL, then, Option.none(), Option.none()));
+        node.then.forEach(this::visit);
+        emit(new Quad(Op.GOTO, endif, Option.none(), Option.none()));
+
+        emit(new Quad(Op.LABEL, else_, Option.none(), Option.none()));
+        node.else_.forEach(this::visit);
+        emit(new Quad(Op.LABEL, endif, Option.none(), Option.none()));
+
         return Option.none();
     }
 }
