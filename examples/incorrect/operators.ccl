@@ -10,17 +10,20 @@ main {
 
     j = -b; // 2. negate a boolean
 
-    if 5 == true { // 3. incorrect types in a comparison // TODO
+    if 5 == true { // 3. mismatched types in equals comparison
     } else {}
 
-    // grammar disallows these constructs
+    if b > 0 // 4. using boolean in > comparison
+    {} else {}
+
+    if (5 == i) // this should work
+    {} else {}
+
+    // grammar disallows these constructs, no need to check semantically
     // if ((~42) == true) // invert an integer
     // // shouldn't the grammar disallow this?
     // {} else {}
 
     // if (3 || 4) // integers in a logical operation
     // {} else {}
-
-    if (5 == i) // this should work
-    {} else {}
 }

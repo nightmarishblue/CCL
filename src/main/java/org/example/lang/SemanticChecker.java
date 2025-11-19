@@ -8,6 +8,7 @@ import org.example.ast.node.*;
 import org.example.ast.node.atom.Reference;
 import org.example.ast.node.atom.literal.Boolean;
 import org.example.ast.node.atom.literal.Integer;
+import org.example.ast.node.condition.Compare;
 import org.example.ast.node.declaration.Const;
 import org.example.ast.node.declaration.Var;
 import org.example.ast.node.expression.Arithmetic;
@@ -189,7 +190,26 @@ public class SemanticChecker extends AstVisitor<Type> {
         return Type.INTEGER;
     }
 
-    // the following nodes' types are dependent on
+    @Override
+    public Type visitCompare(Compare node) {
+        Type left = visit(node.left), right = visit(node.right);
+        // unfortunately the spec tied my hands; equals and not equals must be handled here
+        switch (node.operator) {
+            case EQUALS:
+            case NOT_EQUALS:
+                if (left != right)
+                    error(node, String.format("Mismatched types for %s comparison, %s != %s", node.operator, left, right));
+                break;
+            default:
+                // other operators are only defined for numbers
+                if (!(left == Type.INTEGER && right == Type.INTEGER))
+                    error(node, String.format("Operator %s requires INTEGER, cannot be applied to %s, %s",
+                            node.operator, left, right));
+        }
+        return Type.BOOLEAN;
+    }
+
+    // the following nodes' types are dependent on program state or AST structure
     @Override
     public Type visitReference(Reference node) {
         Option<Data> data = get(node.variable);
