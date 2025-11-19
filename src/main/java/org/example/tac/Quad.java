@@ -16,6 +16,9 @@ public record Quad(Op op, Address arg1, Option<Address> arg2, Option<Address> re
         return switch (op) {
             // special cases for jump, etc. can go here
             case COPY -> String.format("%s = %s", result.get().value(), arg1.value());
+            case GOTO -> String.format("goto %s", arg1.value());
+            case EQUALS, NOT_EQUALS, LESS_THAN, LESS_EQUAL, GREATER_THAN, GREATER_EQUAL ->
+                    String.format("if %s %s %s goto %s", arg1.value(), op.symbol(), arg2.get().value(), result.get().value());
             default -> {
                 if (arg2.present()) yield String.format("%s = %s %s %s", result.get().value(),
                         arg1.value(), op.symbol(), arg2.get().value());

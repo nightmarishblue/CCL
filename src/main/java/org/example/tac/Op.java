@@ -1,5 +1,6 @@
 package org.example.tac;
 
+import org.example.ast.node.condition.Compare;
 import org.example.ast.node.condition.Logic;
 import org.example.ast.node.expression.Arithmetic;
 
@@ -9,10 +10,16 @@ public enum Op {
 
     PLUS, MINUS, TIMES, DIVIDE, // binary arithmetic
     AND, OR, // binary logical
-    NOT; // unary logical
+    NOT, // unary logical
+
+    EQUALS, NOT_EQUALS, LESS_THAN, LESS_EQUAL, GREATER_THAN, GREATER_EQUAL, // comparison
+    LABEL, GOTO, // really stretching the definition of "operator" here guys
+    ;
 
     public String symbol() {
         return switch (this) {
+            case COPY, LABEL, GOTO -> "";
+
             case PLUS -> "+";
             case MINUS -> "-";
             case TIMES -> "*";
@@ -22,7 +29,13 @@ public enum Op {
             case OR -> "||";
 
             case NOT -> "~";
-            default -> "";
+
+            case EQUALS -> "==";
+            case NOT_EQUALS -> "!=";
+            case LESS_THAN -> "<";
+            case LESS_EQUAL -> "<=";
+            case GREATER_THAN -> ">";
+            case GREATER_EQUAL -> ">=";
         };
     }
 
@@ -37,6 +50,17 @@ public enum Op {
         return switch (operator) {
             case AND -> AND;
             case OR -> OR;
+        };
+    }
+
+    public static Op comparison(Compare.Operator operator) {
+        return switch (operator) {
+            case EQUALS -> EQUALS;
+            case NOT_EQUALS -> NOT_EQUALS;
+            case LESS_THAN -> LESS_THAN;
+            case LESS_EQUAL -> LESS_EQUAL;
+            case GREATER_THAN -> GREATER_THAN;
+            case GREATER_EQUAL -> GREATER_EQUAL;
         };
     }
 }
