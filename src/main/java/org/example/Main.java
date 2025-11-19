@@ -10,7 +10,7 @@ import org.example.ast.node.Program;
 import org.example.grammar.CCLLexer;
 import org.example.grammar.CCLParser;
 import org.example.antlr.CompilationFailed;
-import org.example.lang.SemanticChecker;
+import org.example.lang.SemanticAnalyser;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -85,12 +85,16 @@ public class Main {
 
         // 3. semantically analyse (stop if errors)
         ArrayList<SourceError> errors = new ArrayList<>();
-        SemanticChecker checker = new SemanticChecker((node, msg) -> {
+        SemanticAnalyser checker = new SemanticAnalyser((node, msg) -> {
             ParserRuleContext context = sourceMap.get(node);
             Token token = context.getStart();
             errors.add(new SourceError(token, msg));
         });
         checker.visit(program);
         if (!errors.isEmpty()) throw new CompilationFailed(errors);
+
+        // 3.5 apply optimisations if desired
+
+        // 4. translate
     }
 }

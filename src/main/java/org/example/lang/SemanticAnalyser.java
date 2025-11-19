@@ -21,11 +21,11 @@ import org.example.helper.Util;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class SemanticChecker extends AstVisitor<Type> {
+public class SemanticAnalyser extends AstVisitor<Type> {
     private final SymbolTable<Data> environment = new SymbolTable<>();
     public final BiConsumer<Node, String> onError;
 
-    public SemanticChecker(BiConsumer<Node, String> onError) {
+    public SemanticAnalyser(BiConsumer<Node, String> onError) {
         this.onError = onError;
     }
 
