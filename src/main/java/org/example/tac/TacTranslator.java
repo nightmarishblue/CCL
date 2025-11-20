@@ -13,7 +13,6 @@ import org.example.ast.node.condition.Condition;
 import org.example.ast.node.condition.Logic;
 import org.example.ast.node.condition.Not;
 import org.example.ast.node.declaration.Const;
-import org.example.ast.node.declaration.Declaration;
 import org.example.ast.node.declaration.Var;
 import org.example.ast.node.expression.Arithmetic;
 import org.example.ast.node.expression.Result;
@@ -21,6 +20,9 @@ import org.example.ast.node.statement.Assign;
 import org.example.ast.node.statement.IfElse;
 import org.example.ast.node.statement.While;
 import org.example.helper.Option;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 public class TacTranslator extends AstVisitor<Option<Address>> {
     // visit(Expression) should return an address, as should Condition
@@ -59,6 +61,36 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
         visit(node.main);
         return Option.none();
     }
+
+    @Override
+    public Option<Address> visitMain(Main node) {
+        return super.visitMain(node); // default implementation works, label is handled
+    }
+
+    @Override
+    public Option<Address> visitFunction(Function node) {
+        emit(Quad.label(new Address.Name(node.name.value())));
+
+        // retrieve arguments
+        AtomicInteger i = new AtomicInteger();
+        node.parameters.stream()
+                .map(Variable::name)
+                .map(this::variable)
+                .forEach(parameter ->
+                    emit(Quad.unary(Op.GETPARAM, new Address.Constant(i.getAndIncrement()), parameter))
+                );
+
+        node.declarations.forEach(this::visit);
+        node.statements.forEach(this::visit);
+
+        Option<Address> result = node.output.map(this::visit).map(Option::get);
+        // using null is a code smell - it appears quads don't map as cleanly to the problem as the notes said
+        emit(new Quad(Op.RETURN, null, Option.none(), result));
+        return Option.none();
+    }
+
+    // expressions
+    @Override
     public Option<Address> visitLiteral(Literal node) {
         Address out = new Address.Constant(node.value());
         return Option.some(out);
@@ -108,8 +140,8 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
 
     @Override
     public Option<Address> visitVar(Var node) {
-        // we're leaving this as a no-op since we mandate assignment before reading
-        return super.visitVar(node);
+        // this is a no-op since we mandate assignment before reading
+        return Option.none();
     }
 
     @Override
