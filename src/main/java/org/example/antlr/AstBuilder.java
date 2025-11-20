@@ -171,7 +171,19 @@ public class AstBuilder extends CCLBaseVisitor<Node> {
     @Override
     public Assign visitAssignmentStatement(CCLParser.AssignmentStatementContext ctx) {
         final Identifier variable = new Identifier(ctx.var);
-        final Expression value = visitExpression(ctx.expression());
+        int token = ctx.operator.value.getType();
+        final Expression value;
+        if (token == CCLParser.ASSIGN) value = visitExpression(ctx.expression());
+        else {
+            // expand a += 1 to a = a + 1
+            Expression left = new Value(new Reference(variable, false));
+            Arithmetic.Operator operator = switch (token) {
+                case CCLParser.PLUS_EQUALS -> Arithmetic.Operator.PLUS;
+                case CCLParser.MINUS_EQUALS -> Arithmetic.Operator.MINUS;
+                default -> throw new IllegalStateException("Unexpected value: " + token);
+            };
+            value = new Arithmetic(left, operator, visitExpression(ctx.expression()));
+        }
         return callback(new Assign(variable, value), ctx);
     }
 

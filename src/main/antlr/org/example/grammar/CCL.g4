@@ -33,7 +33,7 @@ statement // (12)
     | KW_SKIP SEMICOLON # skipStatement
     ;
 
-assignmentOperator: ASSIGN | PLUS_EQUALS | MINUS_EQUALS;
+assignmentOperator: value=(ASSIGN | PLUS_EQUALS | MINUS_EQUALS);
 
 expression // (13)
     // spec had fragment here, but after removing the mutual left recursion this would make nested arithmetic impossible
