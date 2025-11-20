@@ -11,6 +11,8 @@ import org.example.grammar.CCLLexer;
 import org.example.grammar.CCLParser;
 import org.example.antlr.CompilationFailed;
 import org.example.lang.SemanticAnalyser;
+import org.example.tac.Tac;
+import org.example.tac.TacTranslator;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -89,12 +91,14 @@ public class Main {
             ParserRuleContext context = sourceMap.get(node);
             Token token = context.getStart();
             errors.add(new SourceError(token, msg));
-        });
+        }, Tac.BUILTINS);
         checker.visit(program);
         if (!errors.isEmpty()) throw new CompilationFailed(errors);
 
         // 3.5 apply optimisations if desired
 
         // 4. translate
+        // todo return somehow
+        new TacTranslator(quad -> System.out.println(quad.instruction())).visit(program);
     }
 }

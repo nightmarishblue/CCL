@@ -24,6 +24,7 @@ import org.example.ast.node.statement.While;
 import org.example.helper.Option;
 import org.example.lang.SymbolTable;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -102,7 +103,7 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
     @Override
     public Option<Address> visitFunction(Function node) {
         symbols.pushScope();
-        emit(Quad.label(new Address.Name(node.name.value())));
+        emit(Quad.label(new Address.Name(node.name.value().toLowerCase(Locale.ROOT))));
 
         // retrieve arguments
         AtomicInteger i = new AtomicInteger();
@@ -152,7 +153,7 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
                 .map(this::variable)
                 .forEach(arg -> emit(Quad.single(Op.PARAM, arg)));
 
-        Address.Name function = new Address.Name(functionCall.function.value());
+        Address.Name function = new Address.Name(functionCall.function.value().toLowerCase(Locale.ROOT));
         Address.Constant arguments = new Address.Constant(functionCall.arguments.size());
         emit(new Quad(Op.CALL, function, Option.some(arguments), result));
     }

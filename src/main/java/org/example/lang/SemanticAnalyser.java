@@ -19,14 +19,22 @@ import org.example.helper.Pair;
 import org.example.helper.Util;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 public class SemanticAnalyser extends AstVisitor<Type> {
     private final SymbolTable<Data> environment = new SymbolTable<>();
+    private final Set<Identifier> builtins; // functions from outside the language, which we can't type check
     public final BiConsumer<Node, String> onError;
 
-    public SemanticAnalyser(BiConsumer<Node, String> onError) {
+    public SemanticAnalyser(BiConsumer<Node, String> onError, Set<Identifier> builtins) {
         this.onError = onError;
+        this.builtins = builtins;
+    }
+
+    public SemanticAnalyser(BiConsumer<Node, String> onError) {
+        this(onError, Set.of());
     }
 
     @Override
