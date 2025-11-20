@@ -2,7 +2,6 @@ package org.example.lang;
 
 import org.example.ast.AstVisitor;
 import org.example.ast.data.Identifier;
-import org.example.ast.data.Type;
 import org.example.ast.data.Variable;
 import org.example.ast.node.*;
 import org.example.ast.node.atom.Reference;
@@ -20,17 +19,14 @@ import org.example.helper.Util;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.BiConsumer;
 
-public class SemanticAnalyser extends AstVisitor<Type> {
+public class SemanticAnalyser extends AstVisitor<SemanticAnalyser.Type> {
     private final SymbolTable<Data> environment = new SymbolTable<>();
-    private final Set<Identifier> builtins; // functions from outside the language, which we can't type check
     public final BiConsumer<Node, String> onError;
 
     public SemanticAnalyser(BiConsumer<Node, String> onError, Set<Identifier> builtins) {
         this.onError = onError;
-        this.builtins = builtins;
     }
 
     public SemanticAnalyser(BiConsumer<Node, String> onError) {
@@ -87,13 +83,13 @@ public class SemanticAnalyser extends AstVisitor<Type> {
     @Override
     public Type visitProgram(Program node) {
         wrapScope(node);
-        return Type.VOID;
+        return Type.NONE;
     }
 
     @Override
     public Type visitMain(Main node) {
         wrapScope(node);
-        return Type.VOID;
+        return Type.NONE;
     }
 
     @Override
@@ -105,7 +101,7 @@ public class SemanticAnalyser extends AstVisitor<Type> {
         push();
         // ...and add their parameters to their own scope
         for (Variable parameter : function.parameters) {
-            if (parameter.type() == Type.VOID)
+            if (Type.VOID.is(parameter.type()))
                 error(function, String.format("Function parameter %s cannot be declared with type VOID", parameter.name()));
             if (!add(parameter.name(), new Data.Variable.Mutable(parameter.type()).assign()))
                 alreadyDefined(function, parameter.name());
@@ -115,41 +111,41 @@ public class SemanticAnalyser extends AstVisitor<Type> {
         function.statements.forEach(this::visit);
 
         Type receivedType = function.output.mapOr(Type.VOID, this::visit);
-        if (receivedType != function.type) {
+        if (!receivedType.is(function.type)) {
             error(function.output.mapOr(function, Node.class::cast),
                     String.format("Function %s must return %s, received %s", function.name, function.type, receivedType));
         }
 
         pop();
-        return Type.VOID;
+        return Type.NONE;
     }
 
     // declarations are the only other source of symbols in the table
     @Override
     public Type visitConst(Const node) {
         final Variable var = node.variable;
-        if (var.type() == Type.VOID)
+        if (Type.VOID.is(var.type()))
             error(node, String.format("Constant %s cannot be declared with type VOID", var.name()));
         if (!add(var.name(), new Data.Variable.Constant(var.type())))
             alreadyDefined(node, var.name());
         // don't type check the value if already void
-        if (var.type() != Type.VOID) {
+        if (!Type.VOID.is(var.type())) {
             Type valueType = visit(node.value);
-            if (valueType != var.type())
+            if (!valueType.is(var.type()))
                 error(node, String.format("Constant %s requires a value of type %s, received %s",
                         node.variable.name(), var.type(), valueType));
         }
-        return Type.VOID;
+        return Type.NONE;
     }
 
     @Override
     public Type visitVar(Var node) {
         final Variable var = node.variable;
-        if (var.type() == Type.VOID)
+        if (Type.VOID.is(var.type()))
             error(node, String.format("Variable %s cannot be declared with type VOID", var.name()));
         if (!add(var.name(), new Data.Variable.Mutable(var.type())))
             alreadyDefined(node, var.name());
-        return Type.VOID;
+        return Type.NONE;
     }
 
     @Override
@@ -171,12 +167,12 @@ public class SemanticAnalyser extends AstVisitor<Type> {
             case Data.Variable.Mutable mutable -> {
                 mutable.assign();
                 Type valueType = visit(node.value);
-                if (valueType != mutable.type)
+                if (!valueType.is(mutable.type))
                     error(node, String.format("Variable %s requires a value of type %s, received %s",
                             node.variable, mutable.type, valueType));
             }
         }
-        return Type.VOID;
+        return Type.NONE;
     }
 
     // typed nodes
@@ -192,9 +188,9 @@ public class SemanticAnalyser extends AstVisitor<Type> {
 
     @Override
     public Type visitArithmetic(Arithmetic node) {
-        if (visit(node.left) != Type.INTEGER)
+        if (!(visit(node.left).is(Type.INTEGER)))
             error(node, "Left-hand side of arithmetic expression must be of type INTEGER");
-        if (visit(node.right) != Type.INTEGER)
+        if (!(visit(node.right).is(Type.INTEGER)))
             error(node, "Right-hand side of arithmetic expression must be of type INTEGER");
         return Type.INTEGER;
     }
@@ -212,12 +208,12 @@ public class SemanticAnalyser extends AstVisitor<Type> {
         switch (node.operator) {
             case EQUALS:
             case NOT_EQUALS:
-                if (left != right)
+                if (!left.is(right))
                     error(node, String.format("Mismatched types for %s comparison, %s != %s", node.operator, left, right));
                 break;
             default:
                 // other operators are only defined for numbers
-                if (!(left == Type.INTEGER && right == Type.INTEGER))
+                if (!(left.is(Type.INTEGER) && right.is(Type.INTEGER)))
                     error(node, String.format("Operator %s requires INTEGER, cannot be applied to %s, %s",
                             node.operator, left, right));
         }
@@ -241,7 +237,7 @@ public class SemanticAnalyser extends AstVisitor<Type> {
         if (variable instanceof Data.Variable.Mutable mutable && !mutable.assigned())
             error(node, String.format("Variable %s has not been assigned a value", node.variable));
 
-        if (node.negate && variable.type() != Type.INTEGER)
+        if (node.negate && !variable.type().is(Type.INTEGER))
             error(node, String.format("Variable %s is not an INTEGER and can't be negated", node.variable));
 
         return variable.type();
@@ -279,7 +275,7 @@ public class SemanticAnalyser extends AstVisitor<Type> {
                 continue;
             }
 
-            if (variable.type() != requiredType)
+            if (!variable.type().is(requiredType))
                 error(node, String.format("Argument %s is of type %s, required type is %s",
                         argument, variable.type(), requiredType));
 
@@ -290,11 +286,41 @@ public class SemanticAnalyser extends AstVisitor<Type> {
         return returnType;
     }
 
+    public enum Type {
+        VOID, INTEGER, BOOLEAN, ANY, NONE;
+
+        public static Type of(org.example.ast.data.Type nativeType) {
+            return switch (nativeType) {
+                case VOID -> VOID;
+                case INTEGER -> INTEGER;
+                case BOOLEAN -> BOOLEAN;
+            };
+        }
+
+        public static boolean same(Type left, Type right) {
+            if (left == ANY || right == ANY) return true;
+            if (left == NONE || right == NONE) return false; // had to try out a bottom type
+            return left == right;
+        }
+
+        public boolean is(Type other) {
+            return Type.same(this, other);
+        }
+
+        public boolean is(org.example.ast.data.Type other) {
+            return Type.same(this, Type.of(other));
+        }
+    }
+
     public sealed interface Data {
         Type type();
 
         sealed interface Variable extends Data {
-            record Constant(Type type) implements Variable {}
+            record Constant(Type type) implements Variable {
+                public Constant(org.example.ast.data.Type nativeType) {
+                    this(Type.of(nativeType));
+                }
+            }
 
             final class Mutable implements Variable {
                 private final Type type;
@@ -302,6 +328,10 @@ public class SemanticAnalyser extends AstVisitor<Type> {
 
                 public Mutable(Type type) {
                     this.type = type;
+                }
+
+                public Mutable(org.example.ast.data.Type nativeType) {
+                    this(Type.of(nativeType));
                 }
 
                 public boolean assigned() {
@@ -322,7 +352,8 @@ public class SemanticAnalyser extends AstVisitor<Type> {
 
         record Function(Type returnType, List<Type> parameterTypes) implements Data {
             public static Function of(org.example.ast.node.Function function) {
-                return new Function(function.type, function.parameters.stream().map(org.example.ast.data.Variable::type).toList());
+                return new Function(Type.of(function.type), function.parameters.stream()
+                        .map(org.example.ast.data.Variable::type).map(Type::of).toList());
             }
 
             public Type type() {
