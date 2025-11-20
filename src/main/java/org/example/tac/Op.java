@@ -13,12 +13,26 @@ public enum Op {
     NOT, // unary logical
 
     EQUALS, NOT_EQUALS, LESS_THAN, LESS_EQUAL, GREATER_THAN, GREATER_EQUAL, // comparison
+
+    // control flow
     LABEL, GOTO, // really stretching the definition of "operator" here guys
+
+    // functions
+    RETURN, // this one can have no arguments...
+    PARAM, GETPARAM,
+    CALL,
     ;
 
     public String symbol() {
         return switch (this) {
-            case COPY, LABEL, GOTO -> "";
+            case COPY, LABEL -> "";
+
+            case GOTO -> "goto";
+            case RETURN -> "return";
+            case PARAM -> "param";
+            case GETPARAM -> "getparam";
+            case CALL -> "call";
+
 
             case PLUS -> "+";
             case MINUS -> "-";
@@ -28,7 +42,7 @@ public enum Op {
             case AND -> "&&";
             case OR -> "||";
 
-            case NOT -> "~";
+            case NOT -> "~"; // don't actually know if this is the symbol, the manual was unclear
 
             case EQUALS -> "==";
             case NOT_EQUALS -> "!=";
