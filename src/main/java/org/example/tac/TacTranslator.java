@@ -1,6 +1,11 @@
 package org.example.tac;
 
 import org.example.ast.AstVisitor;
+import org.example.ast.data.Identifier;
+import org.example.ast.data.Variable;
+import org.example.ast.node.Function;
+import org.example.ast.node.Main;
+import org.example.ast.node.Program;
 import org.example.ast.node.atom.Reference;
 import org.example.ast.node.atom.literal.Literal;
 import org.example.ast.node.condition.Compare;
@@ -21,12 +26,17 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
     private int temps = 0;
     private int labels = 0;
 
-    private Address temp() {
+    private Address.Name temp() {
         return new Address.Name("t" + ++temps);
     }
 
     private Address.Name label() {
         return new Address.Name("l" + ++labels);
+    }
+
+    // map variable names to addresses
+    private Address.Name variable(Identifier name) {
+        return new Address.Name(name.value());
     }
 
     private void emit(Quad quad) {
@@ -46,7 +56,7 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
 
     @Override
     public Option<Address> visitReference(Reference node) {
-        Address.Name name = new Address.Name(node.variable.value());
+        Address.Name name = variable(node.variable);
         if (node.negate) {
             Address temp = temp();
             // our 3AC as no unary negation support, so we create a temporary
@@ -71,10 +81,11 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
         return Option.some(out);
     }
 
+    // declarations/assignments
     @Override
     public Option<Address> visitConst(Const node) {
         Address value = visit(node.value).get();
-        Address result = new Address.Name(node.variable.name().value());
+        Address result = variable(node.variable.name());
         emit(Quad.unary(Op.COPY, value, result));
         return Option.none();
     }
@@ -88,7 +99,7 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
     @Override
     public Option<Address> visitAssign(Assign node) {
         Address value = visit(node.value).get();
-        Address result = new Address.Name(node.variable.value());
+        Address result = variable(node.variable);
         emit(Quad.unary(Op.COPY, value, result));
         return Option.none();
     }
@@ -135,7 +146,7 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
         }
     }
 
-
+    // control flow
     @Override
     public Option<Address> visitIfElse(IfElse node) {
         Address.Name then = label(), else_ = label(), endif = label();
