@@ -3,6 +3,7 @@ package org.example.tac;
 import org.example.ast.AstVisitor;
 import org.example.ast.data.Identifier;
 import org.example.ast.data.Variable;
+import org.example.ast.node.Call;
 import org.example.ast.node.Function;
 import org.example.ast.node.Main;
 import org.example.ast.node.Program;
@@ -17,10 +18,12 @@ import org.example.ast.node.declaration.Var;
 import org.example.ast.node.expression.Arithmetic;
 import org.example.ast.node.expression.Result;
 import org.example.ast.node.statement.Assign;
+import org.example.ast.node.statement.Discard;
 import org.example.ast.node.statement.IfElse;
 import org.example.ast.node.statement.While;
 import org.example.helper.Option;
 
+import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -110,10 +113,30 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
         }
     }
 
+    private void invoke(Call functionCall, Option<Address> result) {
+        // prepare arguments
+        functionCall.arguments
+                .reversed()
+                .stream()
+                .map(this::variable)
+                .forEach(arg -> emit(Quad.single(Op.PARAM, arg)));
+
+        Address.Name function = new Address.Name(functionCall.function.value());
+        Address.Constant arguments = new Address.Constant(functionCall.arguments.size());
+        emit(new Quad(Op.CALL, function, Option.some(arguments), result));
+    }
+
     @Override
     public Option<Address> visitResult(Result node) {
-        System.out.printf("!called %s\n", node.functionCall.function); // TODO
-        return Option.some(temp());
+        Address.Name result = temp();
+        invoke(node.functionCall, Option.some(result));
+        return Option.some(result);
+    }
+
+    @Override
+    public Option<Address> visitDiscard(Discard node) {
+        invoke(node.functionCall, Option.none());
+        return Option.none();
     }
 
     @Override

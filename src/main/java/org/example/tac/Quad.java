@@ -32,6 +32,11 @@ public record Quad(Op op, Address arg1, Option<Address> arg2, Option<Address> re
             // unary keywords
             case RETURN -> String.format("return %s", result.mapOr("", Address::value)); // this one can have no value
             case GOTO, PARAM -> String.format("%s %s", op.symbol(), arg1.value());
+            case CALL -> {
+                if (result().present()) yield String.format("%s = %s %s, %s", result.get().value(),
+                        op.symbol(), arg1.value(), arg2.get().value());
+                else yield String.format("%s %s, %s", op.symbol(), arg1.value(), arg2.get().value());
+            }
 
             case LABEL -> String.format("%s:", arg1.value());
 
