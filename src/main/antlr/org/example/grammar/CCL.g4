@@ -25,13 +25,15 @@ main: KW_MAIN LEFT_BRACE declarationList statementList RIGHT_BRACE; // (10)
 statementList: statement*; // (11) (referred to as statementBlock in the spec)
 statementBlock: LEFT_BRACE statementList RIGHT_BRACE;
 statement // (12)
-    : var=IDENTIFIER ASSIGN expression SEMICOLON # assignmentStatement
+    : var=IDENTIFIER operator=assignmentOperator expression SEMICOLON # assignmentStatement
     | functionCall SEMICOLON # functionCallStatement
     | statementBlock # nestedBlockStatement
     | KW_IF condition then=statementBlock KW_ELSE else=statementBlock # ifStatement
     | KW_WHILE condition statementBlock # whileStatement
     | KW_SKIP SEMICOLON # skipStatement
     ;
+
+assignmentOperator: ASSIGN | PLUS_EQUALS | MINUS_EQUALS;
 
 expression // (13)
     // spec had fragment here, but after removing the mutual left recursion this would make nested arithmetic impossible
@@ -97,6 +99,8 @@ SEMICOLON: ';';
 COLON: ':';
 
 ASSIGN: '=';
+PLUS_EQUALS: '+=';
+MINUS_EQUALS: '-=';
 
 LEFT_BRACE: '{';
 RIGHT_BRACE: '}';
