@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-public class SemanticAnalyser extends AstVisitor<SemanticAnalyser.Type> {
+public class SemanticAnalyser extends AstVisitor<Type> {
     private final SymbolTable<Data> environment = new SymbolTable<>();
     public final BiConsumer<Node, String> onError;
 
@@ -286,32 +286,6 @@ public class SemanticAnalyser extends AstVisitor<SemanticAnalyser.Type> {
         }
 
         return returnType;
-    }
-
-    public enum Type {
-        VOID, INTEGER, BOOLEAN, ANY, NONE;
-
-        public static Type of(org.example.ast.data.Type nativeType) {
-            return switch (nativeType) {
-                case VOID -> VOID;
-                case INTEGER -> INTEGER;
-                case BOOLEAN -> BOOLEAN;
-            };
-        }
-
-        public static boolean same(Type left, Type right) {
-            if (left == ANY || right == ANY) return true;
-            if (left == NONE || right == NONE) return false; // had to try out a bottom type
-            return left == right;
-        }
-
-        public boolean is(Type other) {
-            return Type.same(this, other);
-        }
-
-        public boolean is(org.example.ast.data.Type other) {
-            return Type.same(this, Type.of(other));
-        }
     }
 
     public sealed interface Data {
