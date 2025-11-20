@@ -25,12 +25,14 @@ public class SemanticAnalyser extends AstVisitor<SemanticAnalyser.Type> {
     private final SymbolTable<Data> environment = new SymbolTable<>();
     public final BiConsumer<Node, String> onError;
 
-    public SemanticAnalyser(BiConsumer<Node, String> onError, Set<Identifier> builtins) {
+    public SemanticAnalyser(BiConsumer<Node, String> onError) {
         this.onError = onError;
     }
 
-    public SemanticAnalyser(BiConsumer<Node, String> onError) {
-        this(onError, Set.of());
+    public SemanticAnalyser(BiConsumer<Node, String> onError, Map<Identifier, Data.Function> builtins) {
+        this(onError);
+        push();
+        builtins.forEach(this::add); // add all builtins to the prelude
     }
 
     @Override
