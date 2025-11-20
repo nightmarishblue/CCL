@@ -23,12 +23,21 @@ import org.example.ast.node.statement.IfElse;
 import org.example.ast.node.statement.While;
 import org.example.helper.Option;
 
-import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
 public class TacTranslator extends AstVisitor<Option<Address>> {
     // visit(Expression) should return an address, as should Condition
+    final private Consumer<Quad> onEmit;
+
+    public TacTranslator(Consumer<Quad> onEmit) {
+        this.onEmit = onEmit;
+    }
+
+    private void emit(Quad quad) {
+        onEmit.accept(quad);
+    }
+
     private int temps = 0;
     private int labels = 0;
 
@@ -43,10 +52,6 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
     // map variable names to addresses
     private Address.Name variable(Identifier name) {
         return new Address.Name(name.value());
-    }
-
-    private void emit(Quad quad) {
-        System.out.println(quad.instruction()); // TODO expose API
     }
 
     @Override
