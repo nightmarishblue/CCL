@@ -11,10 +11,11 @@ import org.example.grammar.CCLLexer;
 import org.example.grammar.CCLParser;
 import org.example.antlr.CompilationFailed;
 import org.example.lang.SemanticAnalyser;
+import org.example.tac.Quad;
 import org.example.tac.Tac;
 import org.example.tac.TacTranslator;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -22,17 +23,35 @@ import java.util.IdentityHashMap;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        if (args.length < 1) {
+    public static void main(String[] args) {
+        if (args.length == 0) {
             System.err.println("Error: insufficient arguments");
-            System.err.printf("Usage: %s <filename>\n", Main.class.getName());
+            System.err.printf("Usage: %s <input> [output]\n", Main.class.getName());
             System.exit(2);
         }
 
-        final Path filepath = Path.of(args[0]);
-        final String contents = Files.readString(filepath);
+
+        OutputStream output;
+        String contents;
+
         try {
-            compile(CharStreams.fromString(contents));
+            contents = Files.readString(Path.of(args[0]));
+            output = (args.length >= 2) ? new FileOutputStream(args[1]) : System.out;
+        } catch (FileNotFoundException e) {
+            System.err.printf("Error: file %s not found\n", e.getMessage());
+            System.exit(1);
+            return;
+        } catch (IOException ioError) {
+            System.err.printf("Error: I/O exception reading file '%s'\n", ioError.getLocalizedMessage());
+            System.exit(1);
+            return;
+        }
+
+        PrintWriter writer = new PrintWriter(output, true);
+        List<Quad> tac;
+
+        try {
+            tac = compile(CharStreams.fromString(contents));
         } catch (CompilationFailed failure) {
             // print the reason(s) for compilation failure
             final String[] lines = contents.split("\n");
@@ -41,7 +60,10 @@ public class Main {
                 final String space = " ".repeat(error.position());
                 System.err.printf("%s^ %d:%d %s\n", space, error.line() + 1, error.position(), error.message());
             });
+            return;
         }
+
+        tac.stream().map(Quad::instruction).forEach(writer::println);
     }
 
     public static CCLLexer lexer(CharStream chars) {
@@ -95,7 +117,7 @@ public class Main {
     }
 
 
-    public static void compile(CharStream chars) {
+    public static List<Quad> compile(CharStream chars) {
         // compiling a file consists of
         // 1. parse the file (stop if errors)
         final CCLParser.ProgramContext programContext = parse(chars);
@@ -106,7 +128,8 @@ public class Main {
         // 3.5 apply optimisations if desired
 
         // 4. translate
-        // todo return somehow
-        new TacTranslator(quad -> System.out.println(quad.instruction())).visit(program);
+        List<Quad> output = new ArrayList<>();
+        new TacTranslator(output::add).visit(program);
+        return output;
     }
 }
