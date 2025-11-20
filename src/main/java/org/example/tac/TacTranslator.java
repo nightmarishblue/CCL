@@ -48,7 +48,16 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
         return Option.none();
     }
 
+
     @Override
+    public Option<Address> visitProgram(Program node) {
+        node.functions.forEach(this::visit);
+        emit(Quad.label(new Address.Name("main")));
+        // in TACi, main contains the global scope
+        node.declarations.forEach(this::visit);
+        visit(node.main);
+        return Option.none();
+    }
     public Option<Address> visitLiteral(Literal node) {
         Address out = new Address.Constant(node.value());
         return Option.some(out);
