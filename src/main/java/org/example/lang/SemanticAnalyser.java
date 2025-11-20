@@ -292,11 +292,7 @@ public class SemanticAnalyser extends AstVisitor<Type> {
         Type type();
 
         sealed interface Variable extends Data {
-            record Constant(Type type) implements Variable {
-                public Constant(org.example.ast.data.Type nativeType) {
-                    this(Type.of(nativeType));
-                }
-            }
+            record Constant(Type type) implements Variable {}
 
             final class Mutable implements Variable {
                 private final Type type;
@@ -304,10 +300,6 @@ public class SemanticAnalyser extends AstVisitor<Type> {
 
                 public Mutable(Type type) {
                     this.type = type;
-                }
-
-                public Mutable(org.example.ast.data.Type nativeType) {
-                    this(Type.of(nativeType));
                 }
 
                 public boolean assigned() {
@@ -328,8 +320,8 @@ public class SemanticAnalyser extends AstVisitor<Type> {
 
         record Function(Type returnType, List<Type> parameterTypes) implements Data {
             public static Function of(org.example.ast.node.Function function) {
-                return new Function(Type.of(function.type), function.parameters.stream()
-                        .map(org.example.ast.data.Variable::type).map(Type::of).toList());
+                return new Function(function.type, function.parameters.stream()
+                        .map(org.example.ast.data.Variable::type).toList());
             }
 
             public Type type() {

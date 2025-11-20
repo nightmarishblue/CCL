@@ -85,7 +85,7 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
                 Object default_ = switch (d.variable.type()) {
                     case INTEGER -> 0;
                     case BOOLEAN -> false;
-                    case VOID -> throw new RuntimeException("VOID variable declared");
+                    case VOID, ANY, NONE -> throw new RuntimeException(d.variable.type() + " variable declared");
                 };
                 emit(Quad.unary(Op.COPY, new Address.Constant(default_), name));
             }

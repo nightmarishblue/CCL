@@ -12,7 +12,7 @@ import org.example.ast.node.condition.Condition;
 import org.example.ast.node.condition.Logic;
 import org.example.ast.node.condition.Not;
 import org.example.ast.data.Identifier;
-import org.example.ast.data.Type;
+import org.example.lang.Type;
 import org.example.ast.data.Variable;
 import org.example.ast.node.declaration.Const;
 import org.example.ast.node.declaration.Declaration;

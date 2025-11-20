@@ -1,7 +1,7 @@
 package org.example.ast.node;
 
 import org.example.ast.data.Identifier;
-import org.example.ast.data.Type;
+import org.example.lang.Type;
 import org.example.ast.data.Variable;
 import org.example.ast.node.declaration.Declaration;
 import org.example.ast.node.expression.Expression;

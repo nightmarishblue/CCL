@@ -1,6 +1,7 @@
 package org.example.ast.data;
 
 import org.example.grammar.CCLParser;
+import org.example.lang.Type;
 
 public record Variable(Identifier name, Type type) {
     public Variable(CCLParser.VariableContext ctx) {
