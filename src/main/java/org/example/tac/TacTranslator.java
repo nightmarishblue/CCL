@@ -16,6 +16,7 @@ import org.example.ast.node.declaration.Const;
 import org.example.ast.node.declaration.Declaration;
 import org.example.ast.node.declaration.Var;
 import org.example.ast.node.expression.Arithmetic;
+import org.example.ast.node.expression.Result;
 import org.example.ast.node.statement.Assign;
 import org.example.ast.node.statement.IfElse;
 import org.example.ast.node.statement.While;
@@ -75,6 +76,12 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
         } else {
             return Option.some(name);
         }
+    }
+
+    @Override
+    public Option<Address> visitResult(Result node) {
+        System.out.printf("!called %s\n", node.functionCall.function); // TODO
+        return Option.some(temp());
     }
 
     @Override
