@@ -22,13 +22,17 @@ import org.example.ast.node.statement.Discard;
 import org.example.ast.node.statement.IfElse;
 import org.example.ast.node.statement.While;
 import org.example.helper.Option;
+import org.example.lang.SymbolTable;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class TacTranslator extends AstVisitor<Option<Address>> {
-    // visit(Expression) should return an address, as should Condition
     final private Consumer<Quad> onEmit;
+    final private SymbolTable<Address.Name> symbols = new SymbolTable<>();
+    private int temps = 0;
+    private int labels = 0;
+    private int variables = 0;
 
     public TacTranslator(Consumer<Quad> onEmit) {
         this.onEmit = onEmit;
@@ -37,9 +41,6 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
     private void emit(Quad quad) {
         onEmit.accept(quad);
     }
-
-    private int temps = 0;
-    private int labels = 0;
 
     private Address.Name temp() {
         return new Address.Name("t" + ++temps);
@@ -51,7 +52,13 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
 
     // map variable names to addresses
     private Address.Name variable(Identifier name) {
-        return new Address.Name(name.value());
+        // every variable gets a unique address
+        // if a variable is found in scope, use that
+        Option<Address.Name> symbol = symbols.getSymbol(name);
+        if (symbol.present()) return symbol.get();
+        Address.Name address = new Address.Name("v" + ++variables);
+        symbols.putSymbol(name, address);
+        return address;
     }
 
     @Override
@@ -62,21 +69,39 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
 
     @Override
     public Option<Address> visitProgram(Program node) {
+        symbols.pushScope();
+        // add all global variables to the scope
+        node.declarations.forEach(d -> variable(d.variable.name()));
         node.functions.forEach(this::visit);
+
         emit(Quad.label(new Address.Name("main")));
-        // in TACi, main contains the global scope
-        node.declarations.forEach(this::visit);
+        // in TACi, main contains the global scope, hence why the declarations have to go here
+        node.declarations.forEach(d -> {
+            if (d instanceof Const c) visitConst(c); // constants are always defined
+            else {
+                // but variables are normally left blank; we initialise them with a default so they stay in main's scope
+                Address.Name name = variable(d.variable.name());
+                Object default_ = switch (d.variable.type()) {
+                    case INTEGER -> 0;
+                    case BOOLEAN -> false;
+                    case VOID -> throw new RuntimeException("VOID variable declared");
+                };
+                emit(Quad.unary(Op.COPY, new Address.Constant(default_), name));
+            }
+        });
         visit(node.main);
+        symbols.popScope();
         return Option.none();
     }
 
     @Override
     public Option<Address> visitMain(Main node) {
-        return super.visitMain(node); // default implementation works, label is handled
+        return visitChildren(node); // nothing to do from here, just traverse
     }
 
     @Override
     public Option<Address> visitFunction(Function node) {
+        symbols.pushScope();
         emit(Quad.label(new Address.Name(node.name.value())));
 
         // retrieve arguments
@@ -94,6 +119,7 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
         Option<Address> result = node.output.map(this::visit).map(Option::get);
         // using null is a code smell - it appears quads don't map as cleanly to the problem as the notes said
         emit(new Quad(Op.RETURN, null, Option.none(), result));
+        symbols.popScope();
         return Option.none();
     }
 
