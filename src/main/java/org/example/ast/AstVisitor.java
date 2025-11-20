@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 // a (much simpler) visitor inspired by ANTLR's parse tree visitor API
 public abstract class AstVisitor<T> {
     // what to return for a Node with no visit method
-    protected T defaultValue() {
+    protected T defaultValue(Node node) {
         return null;
     }
 
@@ -48,7 +48,7 @@ public abstract class AstVisitor<T> {
 
     // for nodes with no defined method, walk through their children
     public T visitChildren(Node node) {
-        T result = defaultValue();
+        T result = defaultValue(node);
         for (Node child : node.children()) {
             result = aggregate(result, visit(child));
         }

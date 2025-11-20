@@ -36,8 +36,8 @@ public class SemanticAnalyser extends AstVisitor<Type> {
     }
 
     @Override
-    protected Type defaultValue() {
-        return Type.VOID; // void is our "empty" type
+    protected Type defaultValue(Node ignored) {
+        return Type.NONE; // none is our empty type
     }
 
     private void error(Node node, String message) {

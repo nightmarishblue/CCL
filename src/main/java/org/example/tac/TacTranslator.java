@@ -3,10 +3,7 @@ package org.example.tac;
 import org.example.ast.AstVisitor;
 import org.example.ast.data.Identifier;
 import org.example.ast.data.Variable;
-import org.example.ast.node.Call;
-import org.example.ast.node.Function;
-import org.example.ast.node.Main;
-import org.example.ast.node.Program;
+import org.example.ast.node.*;
 import org.example.ast.node.atom.Reference;
 import org.example.ast.node.atom.literal.Literal;
 import org.example.ast.node.condition.Compare;
@@ -63,7 +60,7 @@ public class TacTranslator extends AstVisitor<Option<Address>> {
     }
 
     @Override
-    protected Option<Address> defaultValue() {
+    protected Option<Address> defaultValue(Node ignored) {
         return Option.none();
     }
 
