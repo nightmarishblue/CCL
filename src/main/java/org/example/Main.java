@@ -75,17 +75,13 @@ public class Main {
         return program;
     }
 
-
-    public static void compile(CharStream chars) {
-        // compiling a file consists of
-        // 1. parse the file (stop if errors)
-        final CCLParser.ProgramContext programContext = parse(chars);
-
-        // 2. construct the ast
+    // build the AST from a parsed program context
+    // throw if the tree is incorrect
+    public static Program construct(CCLParser.ProgramContext programContext) {
         final IdentityHashMap<Node, ParserRuleContext> sourceMap = new IdentityHashMap<>();
         final Program program = new AstBuilder(sourceMap::put).visitProgram(programContext);
 
-        // 3. semantically analyse (stop if errors)
+        // semantically analyse (stop if errors)
         ArrayList<SourceError> errors = new ArrayList<>();
         SemanticAnalyser checker = new SemanticAnalyser((node, msg) -> {
             ParserRuleContext context = sourceMap.get(node);
@@ -93,7 +89,19 @@ public class Main {
             errors.add(new SourceError(token, msg));
         }, Tac.BUILTINS);
         checker.visit(program);
+
         if (!errors.isEmpty()) throw new CompilationFailed(errors);
+        return program;
+    }
+
+
+    public static void compile(CharStream chars) {
+        // compiling a file consists of
+        // 1. parse the file (stop if errors)
+        final CCLParser.ProgramContext programContext = parse(chars);
+
+        // 2. construct the ast (and 3., semantically verify it)
+        final Program program = construct(programContext);
 
         // 3.5 apply optimisations if desired
 
