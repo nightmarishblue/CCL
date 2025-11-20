@@ -176,13 +176,13 @@ public class AstBuilder extends CCLBaseVisitor<Node> {
         if (token == CCLParser.ASSIGN) value = visitExpression(ctx.expression());
         else {
             // expand a += 1 to a = a + 1
-            Expression left = new Value(new Reference(variable, false));
+            Expression left = callback(new Value(callback(new Reference(variable, false), ctx)), ctx);
             Arithmetic.Operator operator = switch (token) {
                 case CCLParser.PLUS_EQUALS -> Arithmetic.Operator.PLUS;
                 case CCLParser.MINUS_EQUALS -> Arithmetic.Operator.MINUS;
                 default -> throw new IllegalStateException("Unexpected value: " + token);
             };
-            value = new Arithmetic(left, operator, visitExpression(ctx.expression()));
+            value = callback(new Arithmetic(left, operator, visitExpression(ctx.expression())), ctx);
         }
         return callback(new Assign(variable, value), ctx);
     }

@@ -126,17 +126,20 @@ public class SemanticAnalyser extends AstVisitor<Type> {
     @Override
     public Type visitConst(Const node) {
         final Variable var = node.variable;
-        if (Type.VOID.is(var.type()))
+        Type expressionType = visit(node.value); // evaluate value first just in case
+
+        boolean declaredVoid = var.type().is(Type.VOID);
+        if (declaredVoid)
             error(node, String.format("Constant %s cannot be declared with type VOID", var.name()));
+
         if (!add(var.name(), new Data.Variable.Constant(var.type())))
             alreadyDefined(node, var.name());
+
         // don't type check the value if already void
-        if (!Type.VOID.is(var.type())) {
-            Type valueType = visit(node.value);
-            if (!valueType.is(var.type()))
-                error(node, String.format("Constant %s requires a value of type %s, received %s",
-                        node.variable.name(), var.type(), valueType));
-        }
+        if (!(declaredVoid || expressionType.is(var.type())))
+            error(node, String.format("Constant %s requires a value of type %s, received %s",
+                    node.variable.name(), var.type(), expressionType));
+
         return Type.NONE;
     }
 
@@ -167,11 +170,11 @@ public class SemanticAnalyser extends AstVisitor<Type> {
             case Data.Variable.Constant ignored ->
                     error(node, String.format("Constant %s cannot be reassigned", node.variable));
             case Data.Variable.Mutable mutable -> {
-                mutable.assign();
                 Type valueType = visit(node.value);
                 if (!valueType.is(mutable.type))
                     error(node, String.format("Variable %s requires a value of type %s, received %s",
                             node.variable, mutable.type, valueType));
+                mutable.assign();
             }
         }
         return Type.NONE;
