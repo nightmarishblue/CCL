@@ -6,6 +6,10 @@ import org.example.ast.data.Variable;
 public abstract class Declaration extends Node {
     public final Variable variable;
 
+    public final Variable variable() {
+        return variable;
+    }
+
     public Declaration(Variable variable) {
         this.variable = variable;
     }
