@@ -5,12 +5,14 @@ import org.antlr.v4.runtime.*;
 import org.example.antlr.AstBuilder;
 import org.example.antlr.CollectingErrorListener;
 import org.example.antlr.SourceError;
+import org.example.ast.AstVisitor;
 import org.example.ast.node.Node;
 import org.example.ast.node.Program;
 import org.example.grammar.CCLLexer;
 import org.example.grammar.CCLParser;
 import org.example.antlr.CompilationFailed;
 import org.example.lang.SemanticAnalyser;
+import org.example.lang.UnusedPruner;
 import org.example.tac.Quad;
 import org.example.tac.Tac;
 import org.example.tac.TacTranslator;
@@ -30,9 +32,9 @@ public class Main {
             System.exit(2);
         }
 
-
         OutputStream output;
         String contents;
+        boolean prune = args.length >= 3 && args[2].equals("-p");
 
         try {
             contents = Files.readString(Path.of(args[0]));
@@ -51,7 +53,9 @@ public class Main {
         List<Quad> tac;
 
         try {
-            tac = compile(CharStreams.fromString(contents));
+            List<AstVisitor<Node>> optimisers = new ArrayList<>();
+            if (prune) optimisers.add(UnusedPruner.withBuiltins(Tac.BUILTINS.keySet()));
+            tac = compile(CharStreams.fromString(contents), optimisers);
         } catch (CompilationFailed failure) {
             // print the reason(s) for compilation failure
             final String[] lines = contents.split("\n");
@@ -117,15 +121,17 @@ public class Main {
     }
 
 
-    public static List<Quad> compile(CharStream chars) {
+    public static List<Quad> compile(CharStream chars, List<AstVisitor<Node>> optimisers) {
         // compiling a file consists of
         // 1. parse the file (stop if errors)
         final CCLParser.ProgramContext programContext = parse(chars);
 
         // 2. construct the ast (and 3., semantically verify it)
-        final Program program = construct(programContext);
+        Node program = construct(programContext);
 
         // 3.5 apply optimisations if desired
+        for (AstVisitor<Node> optimiser : optimisers)
+            program = optimiser.visit(program);
 
         // 4. translate
         List<Quad> output = new ArrayList<>();
