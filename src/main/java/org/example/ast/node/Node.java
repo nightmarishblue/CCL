@@ -1,5 +1,7 @@
 package org.example.ast.node;
 
+import org.example.helper.Option;
+
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,6 +19,8 @@ public abstract class Node {
             Object value;
             try { value = field.get(this); }
             catch (IllegalAccessException e) { throw new RuntimeException(e); }
+
+            if (value instanceof Option.Some<?> some) value = some.get(); // unwrap any Option<Node>, etc.
 
             if (value instanceof Node node) result.add(node);
             else if (value instanceof List<?> list) {
