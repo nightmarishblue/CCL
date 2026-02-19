@@ -1,5 +1,10 @@
-Repo for CSC1098 Compiler Construction. The design decisions I made are recorded in the [journal](./JOURNAL.md).
-# How to use
+A basic compiler I wrote for a college assignment.
+
+CCL is a basic language with functions, if statements, loops and arithmetic. It compiles into a 3-address code that runs on [this interpreter](https://www.computing.dcu.ie/~davids/courses/CA4003/TACi.jar).
+
+The design decisions I made are recorded in the [journal](./JOURNAL.md).
+
+# How to use the compiler
 ```sh
 ./gradlew installDist
 ./build/install/CCL/bin/CCL <source> [destination] [-p]
